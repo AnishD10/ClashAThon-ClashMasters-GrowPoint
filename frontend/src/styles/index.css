@@ -1,0 +1,29 @@
+/**
+ * Main Tailwind CSS file
+ * WHY: Provides responsive styling with Tailwind utility classes
+ */
+
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Custom component styles */
+.btn-primary {
+  @apply bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition;
+}
+
+.btn-secondary {
+  @apply bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition;
+}
+
+.card {
+  @apply bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition;
+}
+
+.input-field {
+  @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500;
+}
+
+.page-container {
+  @apply max-w-6xl mx-auto px-4 py-8;
+}
