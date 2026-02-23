@@ -1,6 +1,15 @@
+const path = require("path");
+const dns = require("dns");
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
+
+// Use Google DNS for MongoDB Atlas resolution
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+require("dotenv").config({
+  path: path.resolve(__dirname, "../.env"),
+  override: true,
+});
 
 const connectDB = require("./config/db");
 
@@ -8,7 +17,10 @@ const connectDB = require("./config/db");
 const app = express();
 
 // Connect to MongoDB
+console.log("Starting server and connecting to database...");
 connectDB();
+
+
 
 // Middleware
 app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:3000" }));
@@ -39,5 +51,7 @@ app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`Environment: ${process.env.NODE_ENV}`);
 });
+
+
 
 module.exports = app;

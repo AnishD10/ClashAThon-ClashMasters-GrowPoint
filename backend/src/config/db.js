@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 /**
  * Connect to MongoDB Database
@@ -6,8 +9,10 @@ const mongoose = require("mongoose");
  */
 const connectDB = async () => {
   try {
-    const mongoURI = process.env.MONGODB_URI || "mongodb://localhost:27017/knowyourpotential";
-    
+    const mongoURI =
+      process.env.MONGODB_URI ||
+      "mongodb+srv://np05cp4a240274:thisIShackathon2026@knowyourpotential.o4gjnbt.mongodb.net/?appName=KnowYourPotential";
+
     const conn = await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
