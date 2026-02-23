@@ -21,3 +21,8 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Docker
+docker-compose.override.yml
+.docker/
+*.log

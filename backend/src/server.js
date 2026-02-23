@@ -1,14 +1,12 @@
 const path = require("path");
-const dns = require("dns");
 const express = require("express");
 const cors = require("cors");
 
-// Use Google DNS for MongoDB Atlas resolution
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
-
+// Load environment variables
+// Docker-compose env vars take precedence over .env file
 require("dotenv").config({
   path: path.resolve(__dirname, "../.env"),
-  override: true,
+  override: false,  // Don't override existing environment variables from docker-compose
 });
 
 const connectDB = require("./config/db");

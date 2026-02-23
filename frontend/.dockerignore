@@ -1,0 +1,35 @@
+# Dependencies
+node_modules
+
+# Build output (not needed for dev server)
+build
+dist
+
+# Logs
+npm-debug.log
+yarn-error.log
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+
+# Testing
+coverage
+.eslintcache
+
+# Documentation
+*.md
+
+# Docker
+Dockerfile
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
