@@ -1,0 +1,32 @@
+# Dependencies (will be installed inside container)
+node_modules
+
+# Logs
+npm-debug.log
+yarn-error.log
+*.log
+
+# Environment files (use docker-compose environment instead)
+.env
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+
+# Build outputs
+dist
+build
+
+# Documentation
+*.md
+README.md
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# OS files
+.DS_Store
+Thumbs.db
