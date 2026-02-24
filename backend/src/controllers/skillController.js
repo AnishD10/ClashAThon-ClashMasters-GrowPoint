@@ -1,16 +1,10 @@
 const Skill = require("../models/Skill");
 const LearningPath = require("../models/LearningPath");
 
-/**
- * Get All Skills
- * WHY: Returns skills catalog with filtering options
- * Users browse and discover all available skills
- */
 exports.getAllSkills = async (req, res) => {
   try {
     const { category, difficulty_level, trending } = req.query;
 
-    // Build filter object
     let filter = {};
     if (category) filter.category = category;
     if (difficulty_level) filter.difficulty_level = difficulty_level;
@@ -23,10 +17,6 @@ exports.getAllSkills = async (req, res) => {
   }
 };
 
-/**
- * Get Single Skill
- * WHY: Returns detailed info about a specific skill
- */
 exports.getSkillById = async (req, res) => {
   try {
     const skill = await Skill.findById(req.params.id);
@@ -39,10 +29,6 @@ exports.getSkillById = async (req, res) => {
   }
 };
 
-/**
- * Get Skill Categories
- * WHY: Returns unique categories for filtering (Web Dev, Data Science, etc.)
- */
 exports.getCategories = async (req, res) => {
   try {
     const categories = await Skill.distinct("category");
@@ -52,10 +38,6 @@ exports.getCategories = async (req, res) => {
   }
 };
 
-/**
- * Create Skill (Admin Only)
- * WHY: Allows admins to add new skills to catalog
- */
 exports.createSkill = async (req, res) => {
   try {
     const skill = await Skill.create(req.body);
@@ -65,11 +47,6 @@ exports.createSkill = async (req, res) => {
   }
 };
 
-/**
- * Get Learning Paths
- * WHY: Returns curated learning paths grouped by category/job role
- * Solves decision paralysis by showing structured learning sequences
- */
 exports.getLearningPaths = async (req, res) => {
   try {
     const { category } = req.query;
@@ -83,10 +60,6 @@ exports.getLearningPaths = async (req, res) => {
   }
 };
 
-/**
- * Get Single Learning Path
- * WHY: Returns detailed learning path with all skills and progression
- */
 exports.getLearningPathById = async (req, res) => {
   try {
     const path = await LearningPath.findById(req.params.id).populate("skills.skill_id");

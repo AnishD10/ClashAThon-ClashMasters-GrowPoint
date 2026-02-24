@@ -1,17 +1,12 @@
 const mongoose = require("mongoose");
 
-/**
- * Assessment Schema
- * WHY: Stores quiz questions to evaluate user skills and aptitude
- * Assessments help identify which skills suit the user best
- */
 const assessmentSchema = new mongoose.Schema(
   {
     title: {
       type: String,
       required: true,
     },
-    category: String, // Which skill category this assesses
+    category: String,
     duration_minutes: Number,
     questions: [
       {

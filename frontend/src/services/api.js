@@ -2,13 +2,6 @@ import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
-/**
- * API Service
- * WHY: Centralized API communication layer
- * All frontend requests go through this service
- * Handles JWT token attachment and error handling
- */
-
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -16,7 +9,6 @@ const api = axios.create({
   },
 });
 
-// Add token to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -25,14 +17,12 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Auth APIs
 export const authAPI = {
   register: (data) => api.post("/auth/register", data),
   login: (data) => api.post("/auth/login", data),
   getCurrentUser: () => api.get("/auth/me"),
 };
 
-// Skill APIs
 export const skillAPI = {
   getAllSkills: (params) => api.get("/skills", { params }),
   getSkillById: (id) => api.get(`/skills/${id}`),
@@ -41,7 +31,6 @@ export const skillAPI = {
   getLearningPathById: (id) => api.get(`/skills/paths/${id}`),
 };
 
-// Assessment APIs
 export const assessmentAPI = {
   getAllAssessments: () => api.get("/assessments"),
   startAssessment: (data) => api.post("/assessments/start", data),
@@ -50,7 +39,6 @@ export const assessmentAPI = {
   getAssessmentHistory: () => api.get("/assessments/history/user"),
 };
 
-// User APIs
 export const userAPI = {
   getUserProfile: () => api.get("/users/profile"),
   updateUserProfile: (data) => api.patch("/users/profile", data),

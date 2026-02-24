@@ -2,12 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-/**
- * Login Page Component
- * WHY: Authenticates user with email and password
- * Returns JWT token which is stored and used for API requests
- */
-
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

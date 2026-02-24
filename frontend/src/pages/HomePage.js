@@ -1,16 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-/**
- * Home Page Component
- * WHY: Landing page explaining the platform's value proposition
- * Motivates users to join and start their learning journey
- */
-
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-blue-700 text-white">
-      {/* Hero Section */}
       <div className="page-container text-center py-20">
         <h1 className="text-5xl md:text-6xl font-bold mb-6">
           Know Your Potential 🎯
@@ -36,7 +29,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Features Section */}
       <div className="bg-white text-gray-800 py-20">
         <div className="page-container">
           <h2 className="text-4xl font-bold text-center mb-12">
@@ -44,7 +36,6 @@ export default function HomePage() {
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Feature 1 */}
             <div className="text-center">
               <div className="text-5xl mb-4">📊</div>
               <h3 className="text-2xl font-bold mb-3">Take Assessments</h3>
@@ -54,7 +45,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Feature 2 */}
             <div className="text-center">
               <div className="text-5xl mb-4">🔍</div>
               <h3 className="text-2xl font-bold mb-3">Get Recommendations</h3>
@@ -64,7 +54,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Feature 3 */}
             <div className="text-center">
               <div className="text-5xl mb-4">📚</div>
               <h3 className="text-2xl font-bold mb-3">Start Learning</h3>
@@ -74,7 +63,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Feature 4 */}
             <div className="text-center">
               <div className="text-5xl mb-4">📈</div>
               <h3 className="text-2xl font-bold mb-3">Track Progress</h3>
@@ -83,7 +71,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Feature 5 */}
             <div className="text-center">
               <div className="text-5xl mb-4">💡</div>
               <h3 className="text-2xl font-bold mb-3">Market Insights</h3>
@@ -92,7 +79,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Feature 6 */}
             <div className="text-center">
               <div className="text-5xl mb-4">🚀</div>
               <h3 className="text-2xl font-bold mb-3">Internships (Coming Soon)</h3>
@@ -104,7 +90,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Target Audience */}
       <div className="bg-gray-50 text-gray-800 py-20">
         <div className="page-container">
           <h2 className="text-4xl font-bold text-center mb-12">
@@ -128,7 +113,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* CTA Section */}
       <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white py-20">
         <div className="page-container text-center">
           <h2 className="text-4xl font-bold mb-6">

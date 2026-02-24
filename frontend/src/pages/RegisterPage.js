@@ -2,12 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-/**
- * Register Page Component
- * WHY: Creates new user account with validation
- * Automatically logs in user after successful registration
- */
-
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: "",

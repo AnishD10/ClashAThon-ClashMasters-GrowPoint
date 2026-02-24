@@ -2,12 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { userAPI, assessmentAPI } from "../services/api";
 
-/**
- * Dashboard Page Component
- * WHY: Central hub showing user's learning progress and recommendations
- * Displays: Overall stats, recent assessments, recommended learning paths
- */
-
 export default function DashboardPage() {
   const { user } = useAuth();
   const [dashboard, setDashboard] = useState(null);
@@ -38,7 +32,6 @@ export default function DashboardPage() {
     <div className="page-container">
       <h1 className="text-4xl font-bold mb-8">Welcome, {user?.name}! 👋</h1>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div className="card">
           <h3 className="text-gray-500 text-sm mb-2">Total Attempted</h3>
@@ -69,7 +62,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Overall Progress */}
       <div className="card mb-8">
         <h2 className="text-2xl font-bold mb-4">Overall Progress</h2>
         <div className="w-full bg-gray-200 rounded-full h-4">
@@ -85,7 +77,6 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Recommendations */}
       {recommendations.length > 0 && (
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-4">
@@ -108,7 +99,6 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Call to Action */}
       {recommendations.length === 0 && (
         <div className="card text-center py-12 bg-blue-50">
           <h3 className="text-xl font-bold mb-4">

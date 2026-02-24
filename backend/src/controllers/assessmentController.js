@@ -3,10 +3,6 @@ const UserProgress = require("../models/UserProgress");
 const LearningPath = require("../models/LearningPath");
 const Skill = require("../models/Skill");
 
-/**
- * Get All Assessments
- * WHY: Returns available assessments for skill evaluation
- */
 exports.getAllAssessments = async (req, res) => {
   try {
     const assessments = await Assessment.find({ is_active: true });
@@ -16,11 +12,6 @@ exports.getAllAssessments = async (req, res) => {
   }
 };
 
-/**
- * Start Assessment
- * WHY: Initializes assessment attempt and tracks start time
- * Returns questions (without answers) for the user to attempt
- */
 exports.startAssessment = async (req, res) => {
   try {
     const { assessment_id } = req.body;
@@ -31,7 +22,6 @@ exports.startAssessment = async (req, res) => {
       return res.status(404).json({ error: "Assessment not found" });
     }
 
-    // Create progress record
     const progress = await UserProgress.create({
       user_id: userId,
       assessment_id,
@@ -39,7 +29,6 @@ exports.startAssessment = async (req, res) => {
       started_at: new Date(),
     });
 
-    // Return questions without answers
     const questionsWithoutAnswers = assessment.questions.map((q) => ({
       _id: q._id,
       question: q.question,
@@ -61,23 +50,16 @@ exports.startAssessment = async (req, res) => {
   }
 };
 
-/**
- * Submit Assessment
- * WHY: Evaluates answers, calculates score, and stores performance
- * Core function for skill aptitude measurement
- */
 exports.submitAssessment = async (req, res) => {
   try {
     const { assessment_id, progress_id, answers } = req.body;
     const userId = req.user.id;
 
-    // Get assessment
     const assessment = await Assessment.findById(assessment_id);
     if (!assessment) {
       return res.status(404).json({ error: "Assessment not found" });
     }
 
-    // Calculate score
     let correctCount = 0;
     const detailed_results = assessment.questions.map((question, index) => {
       const userAnswer = answers[index];
@@ -95,7 +77,6 @@ exports.submitAssessment = async (req, res) => {
 
     const score = Math.round((correctCount / assessment.questions.length) * 100);
 
-    // Update progress
     const progress = await UserProgress.findByIdAndUpdate(
       progress_id,
       {
@@ -119,22 +100,10 @@ exports.submitAssessment = async (req, res) => {
   }
 };
 
-/**
- * Get Personalized Recommendations
- * WHY: CORE ENGINE - Analysis algorithm that solves decision paralysis
- * 
- * ALGORITHM LOGIC:
- * 1. Fetch user's assessment scores
- * 2. Identify top 3 skill categories by performance
- * 3. Find learning paths matching those categories
- * 4. Rank paths by market demand + user aptitude
- * 5. Return personalized recommendations
- */
 exports.getRecommendations = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Step 1: Get user's assessment results
     const userScores = await UserProgress.find({ user_id: userId })
       .populate("assessment_id")
       .sort({ score: -1 });
@@ -146,7 +115,6 @@ exports.getRecommendations = async (req, res) => {
       });
     }
 
-    // Step 2: Extract category performance
     const categoryScores = {};
     for (const score of userScores) {
       if (score.assessment_id && score.assessment_id.category) {
@@ -155,19 +123,16 @@ exports.getRecommendations = async (req, res) => {
       }
     }
 
-    // Step 3: Get top categories
     const topCategories = Object.entries(categoryScores)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
       .map(([category]) => category);
 
-    // Step 4: Find matching learning paths
     const learningPaths = await LearningPath.find({
       category: { $in: topCategories },
       is_active: true,
     }).populate("skills.skill_id");
 
-    // Step 5: Score and rank paths
     const rankedPaths = learningPaths
       .map((path) => ({
         ...path.toObject(),
@@ -186,10 +151,6 @@ exports.getRecommendations = async (req, res) => {
   }
 };
 
-/**
- * Get User Assessment History
- * WHY: Shows user's past assessments, scores, and improvement
- */
 exports.getUserAssessmentHistory = async (req, res) => {
   try {
     const userId = req.user.id;

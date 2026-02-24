@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { skillAPI } from "../services/api";
 
-/**
- * Skills Page Component
- * WHY: Browse and explore all available skills
- * Users can filter by category and difficulty level
- */
-
 export default function SkillsPage() {
   const [skills, setSkills] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -41,7 +35,6 @@ export default function SkillsPage() {
     <div className="page-container">
       <h1 className="text-4xl font-bold mb-8">🎯 Explore Skills</h1>
 
-      {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         <div>
           <label className="block text-gray-700 font-semibold mb-2">
@@ -78,7 +71,6 @@ export default function SkillsPage() {
         </div>
       </div>
 
-      {/* Skills Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {skills.map((skill) => (
           <div key={skill._id} className="card">

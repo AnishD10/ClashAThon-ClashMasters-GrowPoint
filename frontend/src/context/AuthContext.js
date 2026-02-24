@@ -1,12 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import { authAPI } from "../services/api";
 
-/**
- * Auth Context
- * WHY: Global state management for user authentication
- * Provides user data and auth functions to all components
- */
-
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -14,7 +8,6 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
 
-  // Check if user is logged in on mount
   useEffect(() => {
     if (token) {
       authAPI

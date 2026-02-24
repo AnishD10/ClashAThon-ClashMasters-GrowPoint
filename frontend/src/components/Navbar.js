@@ -2,12 +2,6 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-/**
- * Navigation Bar Component
- * WHY: Persistent header with links and user menu
- * Shows different options for authenticated vs non-authenticated users
- */
-
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();

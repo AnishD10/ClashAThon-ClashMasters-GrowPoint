@@ -10,10 +10,6 @@ import SkillsPage from "./pages/SkillsPage";
 import AssessmentsPage from "./pages/AssessmentsPage";
 import "./styles/index.css";
 
-/**
- * Protected Route Component
- * WHY: Ensures only authenticated users can access certain routes
- */
 function ProtectedRoute({ children }) {
   const { isAuthenticated, loading } = useAuth();
 
@@ -24,11 +20,6 @@ function ProtectedRoute({ children }) {
   return isAuthenticated ? children : <Navigate to="/login" />;
 }
 
-/**
- * App Component
- * WHY: Main app component that sets up routing and authentication
- * All routes and pages are connected here
- */
 function AppRoutes() {
   const { isAuthenticated } = useAuth();
 
@@ -36,7 +27,6 @@ function AppRoutes() {
     <Router>
       <Navbar />
       <Routes>
-        {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route
           path="/login"
@@ -47,7 +37,6 @@ function AppRoutes() {
           element={isAuthenticated ? <Navigate to="/dashboard" /> : <RegisterPage />}
         />
 
-        {/* Protected Routes */}
         <Route
           path="/dashboard"
           element={
@@ -73,7 +62,6 @@ function AppRoutes() {
           }
         />
 
-        {/* 404 */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

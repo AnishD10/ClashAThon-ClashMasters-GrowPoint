@@ -1,20 +1,15 @@
 services:
-  # MongoDB Database Service
   mongodb:
     image: mongo:7
     container_name: knowyourpotential-mongodb
     restart: unless-stopped
     environment:
-      # MongoDB root credentials
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin123
-      # Auto-create database
       MONGO_INITDB_DATABASE: knowyourpotential
     volumes:
-      # Persist database data between container restarts
       - mongodb_data:/data/db
     ports:
-      # Map container port 27017 to host port 27017
       - "27017:27017"
     networks:
       - app-network
@@ -24,7 +19,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend API Service
   backend:
     build:
       context: ./backend
@@ -34,25 +28,20 @@ services:
     depends_on:
       - mongodb
     environment:
-      # MongoDB connection (uses service name 'mongodb' as hostname)
       MONGODB_URI: mongodb://admin:admin123@mongodb:27017/knowyourpotential?authSource=admin
       JWT_SECRET: chintapakdumdum!
       JWT_EXPIRE: 7d
       NODE_ENV: development
       PORT: 5000
-      # Allow frontend to access API
       CORS_ORIGIN: http://localhost:3000
     volumes:
-      # Mount backend code for hot reload
       - ./backend:/app
-      # Prevent node_modules conflict (use container's version)
       - /app/node_modules
     ports:
       - "5000:5000"
     networks:
       - app-network
 
-  # Frontend React Service
   frontend:
     build:
       context: ./frontend
@@ -62,13 +51,10 @@ services:
     depends_on:
       - backend
     environment:
-      # Tell React where the backend API is
       REACT_APP_API_URL: http://localhost:5000/api
-      # Fix for React dev server in Docker
       WATCHPACK_POLLING: true
       CHOKIDAR_USEPOLLING: true
     volumes:
-      # Mount frontend code for hot reload
       - ./frontend:/app
       - /app/node_modules
     ports:
@@ -78,12 +64,10 @@ services:
     stdin_open: true
     tty: true
 
-# Named volume for MongoDB data persistence
 volumes:
   mongodb_data:
     driver: local
 
-# Custom network for container communication
 networks:
   app-network:
     driver: bridge

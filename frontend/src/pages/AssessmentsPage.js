@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { assessmentAPI } from "../services/api";
 
-/**
- * Assessments Page Component
- * WHY: Browse and take skill assessments
- * Users attempt assessments to evaluate aptitude in different skills
- */
-
 export default function AssessmentsPage() {
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -86,7 +80,6 @@ export default function AssessmentsPage() {
               )}
             </div>
 
-            {/* Progress Bar */}
             <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
               <div
                 className="bg-blue-600 h-2 rounded-full transition-all"
@@ -97,7 +90,6 @@ export default function AssessmentsPage() {
             </div>
           </div>
 
-          {/* Question */}
           <div className="mb-6">
             <h3 className="text-xl font-semibold mb-4">{question.question}</h3>
 
