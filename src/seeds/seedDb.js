@@ -19,9 +19,11 @@ require("dotenv").config({
 
 // Import models
 const Assessment = require("../models/Assessment");
+const LearningPath = require("../models/LearningPath");
 
 // Import questionnaires
 const questionnaires = require("./questionnaires");
+const learningPaths = require("./learningPaths");
 
 const seedDatabase = async () => {
   try {
@@ -33,13 +35,15 @@ const seedDatabase = async () => {
     });
     console.log("✅ Connected to MongoDB");
 
-    // Check if assessments already exist
-    const existingCount = await Assessment.countDocuments();
-    if (existingCount > 0) {
+    // Clear existing data
+    const existingAssessments = await Assessment.countDocuments();
+    const existingLearningPaths = await LearningPath.countDocuments();
+    if (existingAssessments > 0 || existingLearningPaths > 0) {
       console.log(
-        `⚠️  Found ${existingCount} existing assessments. Clearing database...`
+        `⚠️  Found ${existingAssessments} assessments and ${existingLearningPaths} learning paths. Clearing database...`
       );
       await Assessment.deleteMany({});
+      await LearningPath.deleteMany({});
       console.log("🗑️  Database cleared");
     }
 
@@ -54,9 +58,20 @@ const seedDatabase = async () => {
       console.log(`   - Duration: ${assessment.duration_minutes} minutes`);
     }
 
+    // Insert learning paths
+    console.log(`\n🧭 Seeding ${learningPaths.length} learning path(s)...`);
+    for (const learningPath of learningPaths) {
+      const path = new LearningPath(learningPath);
+      await path.save();
+      console.log(`✅ Seeded: "${path.title}" (${path.category})`);
+    }
+
     console.log("\n🎉 Database seeding completed successfully!");
     console.log(
       `📊 Total assessments: ${await Assessment.countDocuments()}`
+    );
+    console.log(
+      `🧭 Total learning paths: ${await LearningPath.countDocuments()}`
     );
 
     // Display summary
@@ -67,6 +82,15 @@ const seedDatabase = async () => {
       console.log(`  Category: ${assessment.category}`);
       console.log(`  Questions: ${assessment.questions.length}`);
       console.log(`  Duration: ${assessment.duration_minutes} minutes`);
+    });
+
+    const paths = await LearningPath.find();
+    console.log("\n🧭 Learning Path Summary:");
+    paths.forEach((path) => {
+      console.log(`\n  ${path.title}`);
+      console.log(`  Category: ${path.category}`);
+      console.log(`  Difficulty: ${path.difficulty_level}`);
+      console.log(`  Hours: ${path.total_hours}`);
     });
 
     process.exit(0);
