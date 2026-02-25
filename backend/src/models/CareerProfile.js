@@ -39,6 +39,15 @@ const careerProfileSchema = new mongoose.Schema(
     },
     locations: [String],
     required_skills: [String],
+    education_cost_range: {
+      min: Number,
+      max: Number,
+      currency: {
+        type: String,
+        default: "NPR",
+      },
+    },
+    education_duration_years: Number,
     is_active: {
       type: Boolean,
       default: true,

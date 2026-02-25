@@ -18,6 +18,12 @@ module.exports = [
     risk_index: "Low",
     locations: ["Kathmandu", "Pokhara", "Butwal"],
     required_skills: ["Content", "Ads", "Analytics", "SEO"],
+    education_cost_range: {
+      min: 80000,
+      max: 250000,
+      currency: "NPR",
+    },
+    education_duration_years: 1,
   },
   {
     title: "Software Engineer",
@@ -38,6 +44,12 @@ module.exports = [
     risk_index: "Medium",
     locations: ["Kathmandu", "Pokhara", "Biratnagar"],
     required_skills: ["JavaScript", "APIs", "Databases"],
+    education_cost_range: {
+      min: 400000,
+      max: 1200000,
+      currency: "NPR",
+    },
+    education_duration_years: 4,
   },
   {
     title: "Data Analyst",
@@ -58,6 +70,12 @@ module.exports = [
     risk_index: "Medium",
     locations: ["Kathmandu", "Pokhara"],
     required_skills: ["Excel", "SQL", "Visualization"],
+    education_cost_range: {
+      min: 400000,
+      max: 900000,
+      currency: "NPR",
+    },
+    education_duration_years: 4,
   },
   {
     title: "Civil Engineer",
@@ -78,6 +96,12 @@ module.exports = [
     risk_index: "Medium",
     locations: ["Kathmandu", "Pokhara", "Dharan"],
     required_skills: ["AutoCAD", "Project Planning", "Surveying"],
+    education_cost_range: {
+      min: 600000,
+      max: 1200000,
+      currency: "NPR",
+    },
+    education_duration_years: 4,
   },
   {
     title: "Nurse",
@@ -98,6 +122,12 @@ module.exports = [
     risk_index: "Low",
     locations: ["Kathmandu", "Pokhara", "Dharan"],
     required_skills: ["Patient Care", "Clinical Skills", "Communication"],
+    education_cost_range: {
+      min: 500000,
+      max: 900000,
+      currency: "NPR",
+    },
+    education_duration_years: 3,
   },
   {
     title: "Accountant",
@@ -118,6 +148,12 @@ module.exports = [
     risk_index: "Medium",
     locations: ["Kathmandu", "Pokhara", "Biratnagar"],
     required_skills: ["Accounting", "Tax", "Excel"],
+    education_cost_range: {
+      min: 300000,
+      max: 800000,
+      currency: "NPR",
+    },
+    education_duration_years: 4,
   },
   {
     title: "Graphic Designer",
@@ -138,6 +174,12 @@ module.exports = [
     risk_index: "Medium",
     locations: ["Kathmandu", "Pokhara"],
     required_skills: ["Design", "Branding", "UI"],
+    education_cost_range: {
+      min: 80000,
+      max: 300000,
+      currency: "NPR",
+    },
+    education_duration_years: 1,
   },
   {
     title: "Tourism and Hospitality Manager",
@@ -158,6 +200,12 @@ module.exports = [
     risk_index: "Medium",
     locations: ["Kathmandu", "Pokhara", "Chitwan"],
     required_skills: ["Operations", "Customer Service", "Leadership"],
+    education_cost_range: {
+      min: 300000,
+      max: 700000,
+      currency: "NPR",
+    },
+    education_duration_years: 4,
   },
   {
     title: "Agriculture Technician",
@@ -178,6 +226,12 @@ module.exports = [
     risk_index: "Medium",
     locations: ["Chitwan", "Butwal", "Biratnagar"],
     required_skills: ["Soil", "Crop Planning", "Field Work"],
+    education_cost_range: {
+      min: 250000,
+      max: 600000,
+      currency: "NPR",
+    },
+    education_duration_years: 4,
   },
   {
     title: "Banking Officer",
@@ -198,6 +252,12 @@ module.exports = [
     risk_index: "Medium",
     locations: ["Kathmandu", "Pokhara", "Biratnagar"],
     required_skills: ["Finance", "Communication", "Customer Service"],
+    education_cost_range: {
+      min: 350000,
+      max: 800000,
+      currency: "NPR",
+    },
+    education_duration_years: 4,
   },
   {
     title: "Secondary School Teacher",
@@ -218,6 +278,12 @@ module.exports = [
     risk_index: "High",
     locations: ["Kathmandu", "Pokhara", "Dharan"],
     required_skills: ["Teaching", "Communication", "Planning"],
+    education_cost_range: {
+      min: 300000,
+      max: 700000,
+      currency: "NPR",
+    },
+    education_duration_years: 4,
   },
   {
     title: "IT Support Technician",
@@ -238,5 +304,11 @@ module.exports = [
     risk_index: "Low",
     locations: ["Kathmandu", "Pokhara", "Biratnagar"],
     required_skills: ["Networking", "Troubleshooting", "Windows"],
+    education_cost_range: {
+      min: 100000,
+      max: 300000,
+      currency: "NPR",
+    },
+    education_duration_years: 1,
   },
 ];

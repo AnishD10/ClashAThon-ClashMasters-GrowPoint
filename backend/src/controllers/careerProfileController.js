@@ -1,5 +1,51 @@
 const CareerProfile = require("../models/CareerProfile");
 
+const demandScoreMap = {
+  High: 20,
+  Medium: 10,
+  Low: 0,
+};
+
+const riskScoreMap = {
+  Low: 10,
+  Medium: 5,
+  High: -5,
+};
+
+const qualificationMatches = (qualifications, educationLevel) => {
+  if (!educationLevel) return true;
+  const level = educationLevel.toLowerCase();
+  const normalized = (qualifications || []).map((q) => q.toLowerCase());
+
+  if (level.includes("+2")) {
+    return normalized.some((q) => q.includes("+2") || q.includes("diploma"));
+  }
+
+  if (level.includes("bachelor")) {
+    return normalized.some(
+      (q) =>
+        q.includes("bachelor") || q.includes("diploma") || q.includes("+2")
+    );
+  }
+
+  if (level.includes("master")) {
+    return true;
+  }
+
+  return true;
+};
+
+const riskMatches = (riskIndex, riskTolerance, academicPerformance) => {
+  if (academicPerformance && academicPerformance.toLowerCase() === "low") {
+    return riskIndex !== "High";
+  }
+
+  if (!riskTolerance) return true;
+  if (riskTolerance === "Low") return riskIndex === "Low";
+  if (riskTolerance === "Medium") return riskIndex !== "High";
+  return true;
+};
+
 exports.getAllCareerProfiles = async (req, res) => {
   try {
     const { category, demand, location } = req.query;
@@ -23,6 +69,86 @@ exports.getCareerProfileById = async (req, res) => {
       return res.status(404).json({ error: "Career profile not found" });
     }
     res.status(200).json({ success: true, career });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getConstraintRecommendations = async (req, res) => {
+  try {
+    const {
+      budget_max,
+      location,
+      education_level,
+      academic_performance,
+      risk_tolerance,
+    } = req.body || {};
+
+    const profiles = await CareerProfile.find({ is_active: true });
+
+    const filtered = profiles.filter((profile) => {
+      if (location && !profile.locations.includes(location)) {
+        return false;
+      }
+
+      if (!qualificationMatches(profile.qualification_required, education_level)) {
+        return false;
+      }
+
+      if (!riskMatches(profile.risk_index, risk_tolerance, academic_performance)) {
+        return false;
+      }
+
+      if (
+        budget_max &&
+        profile.education_cost_range &&
+        typeof profile.education_cost_range.max === "number" &&
+        profile.education_cost_range.max > budget_max
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    const ranked = filtered
+      .map((profile) => {
+        const demandScore = demandScoreMap[profile.demand_indicator] || 0;
+        const riskScore = riskScoreMap[profile.risk_index] || 0;
+        const locationScore = location && profile.locations.includes(location) ? 5 : 0;
+        const budgetScore =
+          budget_max &&
+          profile.education_cost_range &&
+          typeof profile.education_cost_range.max === "number" &&
+          profile.education_cost_range.max <= budget_max
+            ? 5
+            : 0;
+
+        return {
+          ...profile.toObject(),
+          relevance_score: demandScore + riskScore + locationScore + budgetScore,
+          rationale: {
+            demand_score: demandScore,
+            risk_score: riskScore,
+            location_score: locationScore,
+            budget_score: budgetScore,
+          },
+        };
+      })
+      .sort((a, b) => b.relevance_score - a.relevance_score);
+
+    res.status(200).json({
+      success: true,
+      filters_applied: {
+        budget_max,
+        location,
+        education_level,
+        academic_performance,
+        risk_tolerance,
+      },
+      recommendations: ranked.slice(0, 5),
+      message: "Career recommendations filtered by constraints",
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
