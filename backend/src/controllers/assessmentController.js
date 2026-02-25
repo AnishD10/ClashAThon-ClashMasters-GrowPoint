@@ -2,6 +2,7 @@ const Assessment = require("../models/Assessment");
 const UserProgress = require("../models/UserProgress");
 const LearningPath = require("../models/LearningPath");
 const Skill = require("../models/Skill");
+const CareerProfile = require("../models/CareerProfile");
 
 exports.getAllAssessments = async (req, res) => {
   try {
@@ -213,6 +214,77 @@ exports.getRecommendations = async (req, res) => {
       recommendations: rankedPaths.slice(0, 5),
       message: "Personalized learning paths based on your strengths",
       
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+const demandScoreMap = {
+  High: 20,
+  Medium: 10,
+  Low: 0,
+};
+
+const riskScoreMap = {
+  Low: 10,
+  Medium: 5,
+  High: -5,
+};
+
+exports.getCareerRecommendations = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const userScores = await UserProgress.find({ user_id: userId, status: "Completed" })
+      .populate("assessment_id")
+      .sort({ score: -1 });
+
+    if (userScores.length === 0) {
+      return res.status(200).json({
+        recommendations: [],
+        message: "Complete assessments to receive career recommendations",
+      });
+    }
+
+    const categoryScores = {};
+    for (const score of userScores) {
+      if (
+        score.assessment_id &&
+        score.assessment_id.category &&
+        typeof score.score === "number" &&
+        Number.isFinite(score.score)
+      ) {
+        const category = score.assessment_id.category;
+        categoryScores[category] = (categoryScores[category] || 0) + score.score;
+      }
+    }
+
+    const profiles = await CareerProfile.find({ is_active: true });
+    const ranked = profiles
+      .map((profile) => {
+        const baseScore = categoryScores[profile.category] || 0;
+        const demandScore = demandScoreMap[profile.demand_indicator] || 0;
+        const riskScore = riskScoreMap[profile.risk_index] || 0;
+        const totalScore = baseScore + demandScore + riskScore;
+
+        return {
+          ...profile.toObject(),
+          relevance_score: totalScore,
+          rationale: {
+            assessment_score: baseScore,
+            demand_score: demandScore,
+            risk_score: riskScore,
+          },
+        };
+      })
+      .sort((a, b) => b.relevance_score - a.relevance_score);
+
+    res.status(200).json({
+      success: true,
+      user_performance: categoryScores,
+      recommendations: ranked.slice(0, 5),
+      message: "Career recommendations based on aptitude and Nepal market data",
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
