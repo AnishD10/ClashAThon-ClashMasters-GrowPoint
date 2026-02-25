@@ -304,3 +304,79 @@ exports.getUserAssessmentHistory = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+exports.getParentReport = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const userScores = await UserProgress.find({ user_id: userId, status: "Completed" })
+      .populate("assessment_id")
+      .sort({ score: -1 });
+
+    if (userScores.length === 0) {
+      return res.status(200).json({
+        message: "Complete assessments to receive parent report",
+      });
+    }
+
+    const categoryScores = {};
+    for (const score of userScores) {
+      if (
+        score.assessment_id &&
+        score.assessment_id.category &&
+        typeof score.score === "number" &&
+        Number.isFinite(score.score)
+      ) {
+        const category = score.assessment_id.category;
+        categoryScores[category] = (categoryScores[category] || 0) + score.score;
+      }
+    }
+
+    const profiles = await CareerProfile.find({ is_active: true });
+    const ranked = profiles
+      .map((profile) => {
+        const baseScore = categoryScores[profile.category] || 0;
+        const demandScore = demandScoreMap[profile.demand_indicator] || 0;
+        const riskScore = riskScoreMap[profile.risk_index] || 0;
+        const totalScore = baseScore + demandScore + riskScore;
+
+        return {
+          ...profile.toObject(),
+          relevance_score: totalScore,
+        };
+      })
+      .sort((a, b) => b.relevance_score - a.relevance_score)
+      .slice(0, 3);
+
+    const summary = ranked.map((career) => ({
+      career_title: career.title,
+      why_recommended: `Strong match based on aptitude test results. ${career.demand_indicator} demand in Nepal market.`,
+      entry_salary: career.salary_range
+        ? `NPR ${career.salary_range.entry_min.toLocaleString()} - ${career.salary_range.entry_max.toLocaleString()} per month`
+        : "Contact for details",
+      education_cost: career.education_cost_range
+        ? `NPR ${career.education_cost_range.min.toLocaleString()} - ${career.education_cost_range.max.toLocaleString()}`
+        : "Varies",
+      education_duration: career.education_duration_years
+        ? `${career.education_duration_years} year(s)`
+        : "Varies",
+      job_locations: career.locations.join(", "),
+      risk_level: career.risk_index,
+      time_to_job: career.time_to_employment_months
+        ? `${career.time_to_employment_months} months after graduation`
+        : "Varies",
+    }));
+
+    res.status(200).json({
+      success: true,
+      student_strengths: Object.keys(categoryScores)
+        .sort((a, b) => categoryScores[b] - categoryScores[a])
+        .slice(0, 3),
+      top_recommendations: summary,
+      message:
+        "Simplified career report for parents. Shows top 3 realistic career paths based on student's aptitude and Nepal job market.",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
