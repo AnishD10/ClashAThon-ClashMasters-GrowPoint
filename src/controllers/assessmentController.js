@@ -82,6 +82,12 @@ exports.submitAssessment = async (req, res) => {
       return res.status(404).json({ error: "Assessment not found" });
     }
 
+    if (!Array.isArray(answers) || answers.length !== assessment.questions.length) {
+      return res.status(400).json({
+        error: "Answers are missing or do not match the number of questions",
+      });
+    }
+
     // Calculate scores by category
     const categoryScores = {};
     const detailed_results = assessment.questions.map((question, index) => {
@@ -121,6 +127,12 @@ exports.submitAssessment = async (req, res) => {
       totalMaxScore += maxCategoryScore;
     }
 
+    if (totalMaxScore === 0) {
+      return res.status(400).json({
+        error: "Assessment has no scorable questions",
+      });
+    }
+
     const overallPercentage = Math.round((totalScore / totalMaxScore) * 100);
     const overallProfile = getProfileInterpretation(totalScore, totalMaxScore);
 
@@ -152,9 +164,11 @@ exports.getRecommendations = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const userScores = await UserProgress.find({ user_id: userId })
+    const userScores = await UserProgress.find({ user_id: userId, status: "Completed" })
       .populate("assessment_id")
       .sort({ score: -1 });
+
+     
 
     if (userScores.length === 0) {
       return res.status(200).json({
@@ -165,7 +179,12 @@ exports.getRecommendations = async (req, res) => {
 
     const categoryScores = {};
     for (const score of userScores) {
-      if (score.assessment_id && score.assessment_id.category) {
+      if (
+        score.assessment_id &&
+        score.assessment_id.category &&
+        typeof score.score === "number" &&
+        Number.isFinite(score.score)
+      ) {
         const category = score.assessment_id.category;
         categoryScores[category] = (categoryScores[category] || 0) + score.score;
       }
@@ -193,6 +212,7 @@ exports.getRecommendations = async (req, res) => {
       user_performance: categoryScores,
       recommendations: rankedPaths.slice(0, 5),
       message: "Personalized learning paths based on your strengths",
+      
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
