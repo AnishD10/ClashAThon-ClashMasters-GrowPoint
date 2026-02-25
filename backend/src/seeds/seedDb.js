@@ -25,11 +25,39 @@ const LearningPath = require("../models/LearningPath");
 const questionnaires = require("./questionnaires");
 const learningPaths = require("./learningPaths");
 
+const redactMongoUri = (uri) =>
+  uri.replace(/(mongodb(?:\+srv)?:\/\/[^:]+:)([^@]+)@/i, "$1***@");
+
+const logMongoTarget = (uri) => {
+  try {
+    const parsed = new URL(uri);
+    const dbName = parsed.pathname ? parsed.pathname.replace("/", "") : "";
+    console.log(`🔍 MongoDB Host: ${parsed.hostname}`);
+    if (dbName) {
+      console.log(`🔍 MongoDB Database: ${dbName}`);
+    }
+  } catch {
+    // Ignore parsing errors for non-standard URI forms.
+  }
+};
+
 const seedDatabase = async () => {
   try {
     // Connect to MongoDB
     console.log("🔗 Connecting to MongoDB...");
-    await mongoose.connect(process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/knowyourpotential", {
+    const mongoUri =
+      process.env.MONGODB_URI ||
+      "mongodb://127.0.0.1:27017/knowyourpotential";
+    const hasCredentials = /mongodb(?:\+srv)?:\/\/[^@]+@/i.test(mongoUri);
+    console.log(`🔗 MongoDB URI: ${redactMongoUri(mongoUri)}`);
+    logMongoTarget(mongoUri);
+    if (!hasCredentials) {
+      console.warn(
+        "⚠️  MongoDB URI has no credentials. If auth is enabled, include username/password and authSource."
+      );
+    }
+
+    await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
@@ -95,6 +123,11 @@ const seedDatabase = async () => {
 
     process.exit(0);
   } catch (error) {
+    if (error && error.codeName === "Unauthorized") {
+      console.error(
+        "❌ MongoDB authentication failed. Ensure MONGODB_URI includes username, password, and authSource=admin when using the Docker root user."
+      );
+    }
     console.error("❌ Error during seeding:", error);
     process.exit(1);
   }
