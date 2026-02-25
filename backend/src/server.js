@@ -21,6 +21,7 @@ app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/skills", require("./routes/skillRoutes"));
 app.use("/api/assessments", require("./routes/assessmentRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/careers", require("./routes/careerProfileRoutes"));
 
 app.get("/api/health", (req, res) => {
   res.status(200).json({ message: "Server is running", timestamp: new Date() });

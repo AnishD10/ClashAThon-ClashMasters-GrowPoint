@@ -20,10 +20,12 @@ require("dotenv").config({
 // Import models
 const Assessment = require("../models/Assessment");
 const LearningPath = require("../models/LearningPath");
+const CareerProfile = require("../models/CareerProfile");
 
 // Import questionnaires
 const questionnaires = require("./questionnaires");
 const learningPaths = require("./learningPaths");
+const careerProfiles = require("./careerProfiles");
 
 const redactMongoUri = (uri) =>
   uri.replace(/(mongodb(?:\+srv)?:\/\/[^:]+:)([^@]+)@/i, "$1***@");
@@ -66,12 +68,14 @@ const seedDatabase = async () => {
     // Clear existing data
     const existingAssessments = await Assessment.countDocuments();
     const existingLearningPaths = await LearningPath.countDocuments();
-    if (existingAssessments > 0 || existingLearningPaths > 0) {
+    const existingCareerProfiles = await CareerProfile.countDocuments();
+    if (existingAssessments > 0 || existingLearningPaths > 0 || existingCareerProfiles > 0) {
       console.log(
-        `⚠️  Found ${existingAssessments} assessments and ${existingLearningPaths} learning paths. Clearing database...`
+        `⚠️  Found ${existingAssessments} assessments, ${existingLearningPaths} learning paths, and ${existingCareerProfiles} career profiles. Clearing database...`
       );
       await Assessment.deleteMany({});
       await LearningPath.deleteMany({});
+      await CareerProfile.deleteMany({});
       console.log("🗑️  Database cleared");
     }
 
@@ -94,12 +98,23 @@ const seedDatabase = async () => {
       console.log(`✅ Seeded: "${path.title}" (${path.category})`);
     }
 
+    // Insert career profiles
+    console.log(`\n💼 Seeding ${careerProfiles.length} career profile(s)...`);
+    for (const career of careerProfiles) {
+      const profile = new CareerProfile(career);
+      await profile.save();
+      console.log(`✅ Seeded: "${profile.title}" (${profile.category})`);
+    }
+
     console.log("\n🎉 Database seeding completed successfully!");
     console.log(
       `📊 Total assessments: ${await Assessment.countDocuments()}`
     );
     console.log(
       `🧭 Total learning paths: ${await LearningPath.countDocuments()}`
+    );
+    console.log(
+      `💼 Total career profiles: ${await CareerProfile.countDocuments()}`
     );
 
     // Display summary
@@ -119,6 +134,20 @@ const seedDatabase = async () => {
       console.log(`  Category: ${path.category}`);
       console.log(`  Difficulty: ${path.difficulty_level}`);
       console.log(`  Hours: ${path.total_hours}`);
+    });
+
+    const profiles = await CareerProfile.find();
+    console.log("\n💼 Career Profile Summary:");
+    profiles.forEach((profile) => {
+      console.log(`\n  ${profile.title}`);
+      console.log(`  Category: ${profile.category}`);
+      console.log(`  Demand: ${profile.demand_indicator}`);
+      console.log(`  Risk: ${profile.risk_index}`);
+      if (profile.salary_range && profile.salary_range.entry_min) {
+        console.log(
+          `  Entry Salary: ${profile.salary_range.entry_min}-${profile.salary_range.entry_max} ${profile.salary_range.currency}`
+        );
+      }
     });
 
     process.exit(0);
