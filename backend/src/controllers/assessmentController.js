@@ -18,6 +18,10 @@ exports.startAssessment = async (req, res) => {
     const { assessment_id } = req.body;
     const userId = req.user.id;
 
+    if (!assessment_id) {
+      return res.status(400).json({ error: "assessment_id is required" });
+    }
+
     const assessment = await Assessment.findById(assessment_id);
     if (!assessment) {
       return res.status(404).json({ error: "Assessment not found" });
@@ -78,6 +82,13 @@ exports.submitAssessment = async (req, res) => {
     const { assessment_id, progress_id, answers } = req.body;
     const userId = req.user.id;
 
+    // Validate required fields
+    if (!assessment_id || !progress_id || !answers) {
+      return res.status(400).json({
+        error: "assessment_id, progress_id, and answers are required",
+      });
+    }
+
     const assessment = await Assessment.findById(assessment_id);
     if (!assessment) {
       return res.status(404).json({ error: "Assessment not found" });
@@ -85,7 +96,15 @@ exports.submitAssessment = async (req, res) => {
 
     if (!Array.isArray(answers) || answers.length !== assessment.questions.length) {
       return res.status(400).json({
-        error: "Answers are missing or do not match the number of questions",
+        error: `Answers are missing or do not match the number of questions. Expected ${assessment.questions.length}, received ${answers.length}`,
+      });
+    }
+
+    // Verify progress belongs to user
+    const progressCheck = await UserProgress.findById(progress_id);
+    if (!progressCheck || progressCheck.user_id.toString() !== userId) {
+      return res.status(403).json({
+        error: "Progress record not found or does not belong to user",
       });
     }
 

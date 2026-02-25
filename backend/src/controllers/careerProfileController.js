@@ -50,6 +50,13 @@ exports.getAllCareerProfiles = async (req, res) => {
   try {
     const { category, demand, location } = req.query;
 
+    // Validate demand if provided
+    if (demand && !["High", "Medium", "Low"].includes(demand)) {
+      return res.status(400).json({
+        error: "demand must be one of: High, Medium, Low",
+      });
+    }
+
     const filter = { is_active: true };
     if (category) filter.category = category;
     if (demand) filter.demand_indicator = demand;
@@ -64,7 +71,16 @@ exports.getAllCareerProfiles = async (req, res) => {
 
 exports.getCareerProfileById = async (req, res) => {
   try {
-    const career = await CareerProfile.findById(req.params.id);
+    const { id } = req.params;
+    
+    // Validate MongoDB ObjectId format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ 
+        error: "Invalid career profile ID format. Must be a valid MongoDB ObjectId (24 hex characters)." 
+      });
+    }
+    
+    const career = await CareerProfile.findById(id);
     if (!career) {
       return res.status(404).json({ error: "Career profile not found" });
     }
@@ -83,6 +99,20 @@ exports.getConstraintRecommendations = async (req, res) => {
       academic_performance,
       risk_tolerance,
     } = req.body || {};
+
+    // Validate budget_max if provided
+    if (budget_max !== undefined && (typeof budget_max !== "number" || budget_max < 0)) {
+      return res.status(400).json({
+        error: "budget_max must be a positive number",
+      });
+    }
+
+    // Validate risk_tolerance if provided
+    if (risk_tolerance && !["Low", "Medium", "High"].includes(risk_tolerance)) {
+      return res.status(400).json({
+        error: "risk_tolerance must be one of: Low, Medium, High",
+      });
+    }
 
     const profiles = await CareerProfile.find({ is_active: true });
 
