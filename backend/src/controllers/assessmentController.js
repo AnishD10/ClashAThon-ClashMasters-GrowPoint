@@ -50,6 +50,28 @@ exports.startAssessment = async (req, res) => {
   }
 };
 
+// Helper function to convert Likert response to numeric value
+const getLikertScore = (response) => {
+  const likertMap = {
+    "Strongly Disagree": 1,
+    "Disagree": 2,
+    "Neutral": 3,
+    "Agree": 4,
+    "Strongly Agree": 5,
+  };
+  return likertMap[response] || 0;
+};
+
+// Helper function to interpret category score
+const getProfileInterpretation = (score, maxScore) => {
+  const percentage = (score / maxScore) * 100;
+  if (percentage >= 80) return "Very Strong";
+  if (percentage >= 60) return "Strong";
+  if (percentage >= 40) return "Moderate";
+  if (percentage >= 20) return "Developing";
+  return "Emerging";
+};
+
 exports.submitAssessment = async (req, res) => {
   try {
     const { assessment_id, progress_id, answers } = req.body;
@@ -60,29 +82,66 @@ exports.submitAssessment = async (req, res) => {
       return res.status(404).json({ error: "Assessment not found" });
     }
 
-    let correctCount = 0;
+    if (!Array.isArray(answers) || answers.length !== assessment.questions.length) {
+      return res.status(400).json({
+        error: "Answers are missing or do not match the number of questions",
+      });
+    }
+
+    // Calculate scores by category
+    const categoryScores = {};
     const detailed_results = assessment.questions.map((question, index) => {
       const userAnswer = answers[index];
-      const isCorrect = userAnswer === question.correct_answer;
-      if (isCorrect) correctCount++;
+      const likertValue = getLikertScore(userAnswer);
+      const category = question.category || "General";
+
+      if (!categoryScores[category]) {
+        categoryScores[category] = { total: 0, count: 0 };
+      }
+      categoryScores[category].total += likertValue;
+      categoryScores[category].count += 1;
 
       return {
         question: question.question,
+        category: category,
         user_answer: userAnswer,
-        correct_answer: question.correct_answer,
-        is_correct: isCorrect,
-        explanation: question.explanation,
+        likert_value: likertValue,
+        insight: question.insight,
       };
     });
 
-    const score = Math.round((correctCount / assessment.questions.length) * 100);
+    // Calculate overall score and category profiles
+    const categoryProfiles = {};
+    let totalScore = 0;
+    let totalMaxScore = 0;
+
+    for (const [category, data] of Object.entries(categoryScores)) {
+      const maxCategoryScore = data.count * 5; // Max Likert value is 5
+      categoryProfiles[category] = {
+        score: data.total,
+        max_score: maxCategoryScore,
+        percentage: Math.round((data.total / maxCategoryScore) * 100),
+        profile: getProfileInterpretation(data.total, maxCategoryScore),
+      };
+      totalScore += data.total;
+      totalMaxScore += maxCategoryScore;
+    }
+
+    if (totalMaxScore === 0) {
+      return res.status(400).json({
+        error: "Assessment has no scorable questions",
+      });
+    }
+
+    const overallPercentage = Math.round((totalScore / totalMaxScore) * 100);
+    const overallProfile = getProfileInterpretation(totalScore, totalMaxScore);
 
     const progress = await UserProgress.findByIdAndUpdate(
       progress_id,
       {
-        status: score >= assessment.passing_score ? "Completed" : "In Progress",
-        score,
-        completion_percentage: score,
+        status: "Completed",
+        score: overallPercentage,
+        completion_percentage: overallPercentage,
         completed_at: new Date(),
       },
       { new: true }
@@ -90,10 +149,11 @@ exports.submitAssessment = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      score,
-      passing_score: assessment.passing_score,
-      passed: score >= assessment.passing_score,
+      overall_score: overallPercentage,
+      overall_profile: overallProfile,
+      category_profiles: categoryProfiles,
       detailed_results,
+      message: "Assessment completed. Review your psychometric profile above.",
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -104,9 +164,11 @@ exports.getRecommendations = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    const userScores = await UserProgress.find({ user_id: userId })
+    const userScores = await UserProgress.find({ user_id: userId, status: "Completed" })
       .populate("assessment_id")
       .sort({ score: -1 });
+
+     
 
     if (userScores.length === 0) {
       return res.status(200).json({
@@ -117,7 +179,12 @@ exports.getRecommendations = async (req, res) => {
 
     const categoryScores = {};
     for (const score of userScores) {
-      if (score.assessment_id && score.assessment_id.category) {
+      if (
+        score.assessment_id &&
+        score.assessment_id.category &&
+        typeof score.score === "number" &&
+        Number.isFinite(score.score)
+      ) {
         const category = score.assessment_id.category;
         categoryScores[category] = (categoryScores[category] || 0) + score.score;
       }
@@ -145,6 +212,7 @@ exports.getRecommendations = async (req, res) => {
       user_performance: categoryScores,
       recommendations: rankedPaths.slice(0, 5),
       message: "Personalized learning paths based on your strengths",
+      
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
