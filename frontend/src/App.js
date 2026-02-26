@@ -8,6 +8,11 @@ import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import SkillsPage from "./pages/SkillsPage";
 import AssessmentsPage from "./pages/AssessmentsPage";
+import CareerRecommendationsPage from "./pages/CareerRecommendationsPage";
+import CareerDetailPage from "./pages/CareerDetailPage";
+import SkillDetailPage from "./pages/SkillDetailPage";
+import CoursesPage from "./pages/CoursesPage";
+import ProfilePage from "./pages/ProfilePage";
 import "./styles/index.css";
 
 /**
@@ -69,6 +74,46 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <AssessmentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/careers"
+          element={
+            <ProtectedRoute>
+              <CareerRecommendationsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/careers/:careerId"
+          element={
+            <ProtectedRoute>
+              <CareerDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/skills/:skillId"
+          element={
+            <ProtectedRoute>
+              <SkillDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/courses"
+          element={
+            <ProtectedRoute>
+              <CoursesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
             </ProtectedRoute>
           }
         />

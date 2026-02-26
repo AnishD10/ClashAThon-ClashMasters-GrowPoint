@@ -47,6 +47,7 @@ export const assessmentAPI = {
   startAssessment: (data) => api.post("/assessments/start", data),
   submitAssessment: (data) => api.post("/assessments/submit", data),
   getRecommendations: () => api.get("/assessments/recommendations/personalized"),
+  getCareerRecommendations: () => api.get("/assessments/recommendations/careers"),
   getAssessmentHistory: () => api.get("/assessments/history/user"),
 };
 
@@ -56,6 +57,17 @@ export const userAPI = {
   updateUserProfile: (data) => api.patch("/users/profile", data),
   getUserDashboard: () => api.get("/users/dashboard"),
   getUserProgress: (params) => api.get("/users/progress", { params }),
+};
+
+export const careerAPI = {
+  getAllCareers: (params) => api.get("/careers", { params }),
+  getCareerById: (id) => api.get(`/careers/${id}`),
+  getCareerDetail: (id) => api.get(`/careers/${id}/detail`),
+};
+
+export const courseAPI = {
+  getAllCourses: (params) => api.get("/courses", { params }),
+  getCourseById: (id) => api.get(`/courses/${id}`),
 };
 
 export default api;

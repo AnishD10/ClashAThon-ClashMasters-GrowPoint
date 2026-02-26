@@ -125,6 +125,94 @@ exports.getUserProgress = async (req, res) => {
   }
 };
 
+const isValidObjectId = (value) => /^[0-9a-fA-F]{24}$/.test(value);
+
+exports.upsertSkillProgress = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const {
+      skill_id,
+      status,
+      completion_percentage,
+      score,
+      time_spent_hours,
+      notes,
+    } = req.body;
+
+    if (!skill_id || !isValidObjectId(skill_id)) {
+      return res.status(400).json({ error: "Valid skill_id is required" });
+    }
+
+    const updateFields = {};
+    if (status !== undefined) updateFields.status = status;
+    if (completion_percentage !== undefined) {
+      updateFields.completion_percentage = completion_percentage;
+    }
+    if (score !== undefined) updateFields.score = score;
+    if (time_spent_hours !== undefined) {
+      updateFields.time_spent_hours = time_spent_hours;
+    }
+    if (notes !== undefined) updateFields.notes = notes;
+
+    if (status === "In Progress") {
+      updateFields.started_at = new Date();
+    }
+    if (status === "Completed") {
+      updateFields.completed_at = new Date();
+      if (completion_percentage === undefined) {
+        updateFields.completion_percentage = 100;
+      }
+    }
+
+    const progress = await UserProgress.findOneAndUpdate(
+      { user_id: userId, skill_id },
+      { $set: updateFields, $setOnInsert: { user_id: userId, skill_id } },
+      { new: true, upsert: true, runValidators: true }
+    ).populate("skill_id");
+
+    res.status(200).json({ success: true, progress });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateUserProgress = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ error: "Invalid progress ID format" });
+    }
+
+    const updateFields = { ...req.body };
+
+    if (updateFields.status === "In Progress" && !updateFields.started_at) {
+      updateFields.started_at = new Date();
+    }
+    if (updateFields.status === "Completed" && !updateFields.completed_at) {
+      updateFields.completed_at = new Date();
+      if (updateFields.completion_percentage === undefined) {
+        updateFields.completion_percentage = 100;
+      }
+    }
+
+    const progress = await UserProgress.findOneAndUpdate(
+      { _id: id, user_id: userId },
+      updateFields,
+      { new: true, runValidators: true }
+    ).populate("skill_id assessment_id");
+
+    if (!progress) {
+      return res.status(404).json({ error: "Progress record not found" });
+    }
+
+    res.status(200).json({ success: true, progress });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.uploadAvatar = async (req, res) => {
   try {
     if (!req.file) {
