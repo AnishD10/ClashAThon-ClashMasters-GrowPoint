@@ -1,0 +1,48 @@
+const learningPaths = [
+  {
+    title: "Analytical Foundations",
+    description: "Build core analytical thinking and problem-solving skills.",
+    category: "aptitude",
+    target_users: ["Students", "Career Switchers"],
+    skills: [],
+    total_hours: 30,
+    difficulty_level: "Beginner",
+    job_outcomes: ["Business Analyst", "Data Analyst"],
+    is_active: true,
+  },
+  {
+    title: "Technical Starter Pack",
+    description: "Introductory technical skills for entry-level roles.",
+    category: "technical",
+    target_users: ["Beginners"],
+    skills: [],
+    total_hours: 40,
+    difficulty_level: "Beginner",
+    job_outcomes: ["Junior Developer", "QA Tester"],
+    is_active: true,
+  },
+  {
+    title: "Personality to Profession",
+    description: "Align your personality strengths with career pathways.",
+    category: "personality",
+    target_users: ["All"],
+    skills: [],
+    total_hours: 20,
+    difficulty_level: "Beginner",
+    job_outcomes: ["Team Lead", "Customer Success"],
+    is_active: true,
+  },
+  {
+    title: "Analytical Deep Dive",
+    description: "Advanced analytical methods and structured problem solving.",
+    category: "analytical",
+    target_users: ["Professionals"],
+    skills: [],
+    total_hours: 45,
+    difficulty_level: "Intermediate",
+    job_outcomes: ["Data Scientist", "Product Analyst"],
+    is_active: true,
+  },
+];
+
+module.exports = learningPaths;

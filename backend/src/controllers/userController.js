@@ -1,10 +1,23 @@
 const User = require("../models/User");
 const UserProgress = require("../models/UserProgress");
+const cloudinary = require("../config/cloudinary");
+const multer = require("multer");
 
-/**
- * Get User Profile
- * WHY: Returns user's account and learning data
- */
+const storage = multer.memoryStorage();
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only image files are allowed"), false);
+    }
+  },
+});
+
+exports.uploadMiddleware = upload.single("avatar");
+
 exports.getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -14,17 +27,38 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
-/**
- * Update User Profile
- * WHY: Allows users to update their info, interests, education level
- */
 exports.updateUserProfile = async (req, res) => {
   try {
-    const { name, education_level, interests, profile_completed } = req.body;
+    const {
+      name,
+      education_level,
+      interests,
+      profile_completed,
+      phone,
+      date_of_birth,
+      gender,
+      city,
+      bio,
+      academic_performance,
+      budget_preference,
+    } = req.body;
+
+    const updateFields = {};
+    if (name !== undefined) updateFields.name = name;
+    if (education_level !== undefined) updateFields.education_level = education_level;
+    if (interests !== undefined) updateFields.interests = interests;
+    if (profile_completed !== undefined) updateFields.profile_completed = profile_completed;
+    if (phone !== undefined) updateFields.phone = phone;
+    if (date_of_birth !== undefined) updateFields.date_of_birth = date_of_birth;
+    if (gender !== undefined) updateFields.gender = gender;
+    if (city !== undefined) updateFields.city = city;
+    if (bio !== undefined) updateFields.bio = bio;
+    if (academic_performance !== undefined) updateFields.academic_performance = academic_performance;
+    if (budget_preference !== undefined) updateFields.budget_preference = budget_preference;
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { name, education_level, interests, profile_completed },
+      updateFields,
       { new: true, runValidators: true }
     );
 
@@ -34,23 +68,15 @@ exports.updateUserProfile = async (req, res) => {
   }
 };
 
-/**
- * Get User Learning Dashboard
- * WHY: Shows overall progress, completed skills, current learning status
- * Dashboard displays: Total skills attempted, completion %, trending skills
- */
 exports.getUserDashboard = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Get user
     const user = await User.findById(userId);
 
-    // Get user's progress
     const progress = await UserProgress.find({ user_id: userId })
       .populate("skill_id assessment_id");
 
-    // Calculate stats
     const totalAttempted = progress.length;
     const completed = progress.filter((p) => p.status === "Completed").length;
     const inProgress = progress.filter((p) => p.status === "In Progress").length;
@@ -81,10 +107,6 @@ exports.getUserDashboard = async (req, res) => {
   }
 };
 
-/**
- * Get User Learning Progress
- * WHY: Detailed skill-wise progress for tracking improvement
- */
 exports.getUserProgress = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -98,6 +120,71 @@ exports.getUserProgress = async (req, res) => {
       .sort({ createdAt: -1 });
 
     res.status(200).json({ success: true, progress });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+
+    if (user.avatar_public_id) {
+      await cloudinary.uploader.destroy(user.avatar_public_id);
+    }
+
+    const result = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: "knowyourpotential/avatars",
+          transformation: [{ width: 400, height: 400, crop: "fill" }],
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(req.file.buffer);
+    });
+
+    user.avatar_url = result.secure_url;
+    user.avatar_public_id = result.public_id;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      avatar_url: user.avatar_url,
+      message: "Avatar uploaded successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.deleteAvatar = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId);
+
+    if (!user.avatar_public_id) {
+      return res.status(400).json({ error: "No avatar to delete" });
+    }
+
+    await cloudinary.uploader.destroy(user.avatar_public_id);
+
+    user.avatar_url = null;
+    user.avatar_public_id = null;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Avatar deleted successfully",
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

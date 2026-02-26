@@ -1,9 +1,5 @@
 const mongoose = require("mongoose");
 
-/**
- * Connect to MongoDB Database
- * Supports both Docker (local container) and Atlas (production)
- */
 const connectDB = async () => {
   try {
     const mongoURI =
