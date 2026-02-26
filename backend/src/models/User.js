@@ -36,6 +36,29 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    avatar_url: {
+      type: String,
+      default: null,
+    },
+    avatar_public_id: {
+      type: String,
+      default: null,
+    },
+    phone: String,
+    date_of_birth: Date,
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Other", "Prefer not to say"],
+    },
+    city: String,
+    bio: String,
+    academic_performance: {
+      type: String,
+      enum: ["High", "Medium", "Low"],
+    },
+    budget_preference: Number,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
   },
   { timestamps: true }
 );

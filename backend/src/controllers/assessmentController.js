@@ -251,6 +251,34 @@ const riskScoreMap = {
   High: -5,
 };
 
+const assessmentCategoryToCareerCategories = {
+  aptitude: [
+    "Technology",
+    "Business",
+    "Finance",
+    "Engineering",
+    "Healthcare",
+    "Education",
+    "Creative",
+    "Hospitality",
+    "Agriculture",
+  ],
+  technical: ["Technology", "Engineering"],
+  analytical: ["Finance", "Business", "Technology"],
+  personality: ["Education", "Hospitality", "Healthcare", "Business"],
+  all: [
+    "Technology",
+    "Business",
+    "Finance",
+    "Engineering",
+    "Healthcare",
+    "Education",
+    "Creative",
+    "Hospitality",
+    "Agriculture",
+  ],
+};
+
 exports.getCareerRecommendations = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -280,9 +308,26 @@ exports.getCareerRecommendations = async (req, res) => {
     }
 
     const profiles = await CareerProfile.find({ is_active: true });
+    const careerCategoryScores = {};
+
+    Object.entries(categoryScores).forEach(([assessmentCategory, score]) => {
+      const mappedCategories =
+        assessmentCategoryToCareerCategories[assessmentCategory] || [];
+
+      if (mappedCategories.length === 0) {
+        return;
+      }
+
+      const distributedScore = score / mappedCategories.length;
+      mappedCategories.forEach((careerCategory) => {
+        careerCategoryScores[careerCategory] =
+          (careerCategoryScores[careerCategory] || 0) + distributedScore;
+      });
+    });
+
     const ranked = profiles
       .map((profile) => {
-        const baseScore = categoryScores[profile.category] || 0;
+        const baseScore = careerCategoryScores[profile.category] || 0;
         const demandScore = demandScoreMap[profile.demand_indicator] || 0;
         const riskScore = riskScoreMap[profile.risk_index] || 0;
         const totalScore = baseScore + demandScore + riskScore;
@@ -302,6 +347,7 @@ exports.getCareerRecommendations = async (req, res) => {
     res.status(200).json({
       success: true,
       user_performance: categoryScores,
+      career_category_scores: careerCategoryScores,
       recommendations: ranked.slice(0, 5),
       message: "Career recommendations based on aptitude and Nepal market data",
     });

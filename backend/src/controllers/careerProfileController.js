@@ -1,4 +1,6 @@
 const CareerProfile = require("../models/CareerProfile");
+const Skill = require("../models/Skill");
+const LearningPath = require("../models/LearningPath");
 
 const demandScoreMap = {
   High: 20,
@@ -85,6 +87,48 @@ exports.getCareerProfileById = async (req, res) => {
       return res.status(404).json({ error: "Career profile not found" });
     }
     res.status(200).json({ success: true, career });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getCareerProfileDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        error: "Invalid career profile ID format. Must be a valid MongoDB ObjectId (24 hex characters).",
+      });
+    }
+
+    const career = await CareerProfile.findById(id);
+    if (!career) {
+      return res.status(404).json({ error: "Career profile not found" });
+    }
+
+    const requiredSkills = (career.required_skills || []).filter(Boolean);
+    const skills = requiredSkills.length
+      ? await Skill.find({ name: { $in: requiredSkills } }).sort({ name: 1 })
+      : [];
+
+    const resolvedSkillNames = new Set(skills.map((skill) => skill.name));
+    const missing_skills = requiredSkills.filter(
+      (skill) => !resolvedSkillNames.has(skill)
+    );
+
+    const learning_paths = await LearningPath.find({
+      category: career.category,
+      is_active: true,
+    }).populate("skills.skill_id");
+
+    res.status(200).json({
+      success: true,
+      career,
+      skills,
+      missing_skills,
+      learning_paths,
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -178,6 +222,69 @@ exports.getConstraintRecommendations = async (req, res) => {
       },
       recommendations: ranked.slice(0, 5),
       message: "Career recommendations filtered by constraints",
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.createCareerProfile = async (req, res) => {
+  try {
+    const career = await CareerProfile.create(req.body);
+    res.status(201).json({ success: true, career });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.updateCareerProfile = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        error: "Invalid career profile ID format",
+      });
+    }
+
+    const career = await CareerProfile.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!career) {
+      return res.status(404).json({ error: "Career profile not found" });
+    }
+
+    res.status(200).json({ success: true, career });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.deleteCareerProfile = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        error: "Invalid career profile ID format",
+      });
+    }
+
+    const career = await CareerProfile.findByIdAndUpdate(
+      id,
+      { is_active: false },
+      { new: true }
+    );
+
+    if (!career) {
+      return res.status(404).json({ error: "Career profile not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Career profile deactivated successfully",
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
