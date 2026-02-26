@@ -65,9 +65,9 @@ export default function Navbar() {
           Know Your Potential
         </Link>
 
-        {/* ── MIDDLE: Nav Links (authenticated only) ── */}
+        {/* ── MIDDLE: Nav Links — hidden on mobile, visible on md+ ── */}
         {isAuthenticated && (
-          <div className="flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
+          <div className="hidden md:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
 
             {/* Dashboard dropdown */}
             <div className="relative">
@@ -143,12 +143,12 @@ export default function Navbar() {
                     </div>
                   </div>
 
-                  {/* Menu items */}
+                  {/* Menu items — always shown (mobile uses profile dropdown for nav) */}
                   <div className="pt-2">
                     {[
-                      { icon: "📊", label: "My Dashboard", to: "/dashboard" },
-                      { icon: "🎯", label: "My Assessments", to: "/assessments" },
-                      { icon: "📚", label: "My Learning Path", to: "/skills" },
+                      { icon: "fa-solid fa-chart-bar", label: "My Dashboard", to: "/dashboard" },
+                      { icon: "fa-solid fa-clipboard-list", label: "My Assessments", to: "/assessments" },
+                      { icon: "fa-solid fa-book-open", label: "My Learning Path", to: "/skills" },
                     ].map((item) => (
                       <Link
                         key={item.label}
@@ -157,7 +157,7 @@ export default function Navbar() {
                         className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1a1a1a] transition-colors group"
                       >
                         <div className="flex items-center gap-3">
-                          <span className="text-base">{item.icon}</span>
+                          <i className={`${item.icon} text-gray-400 group-hover:text-[#1a1a1a] text-sm`}></i>
                           <span>{item.label}</span>
                         </div>
                         <svg className="w-4 h-4 text-gray-300 group-hover:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +173,7 @@ export default function Navbar() {
                       onClick={handleLogout}
                       className="w-full flex items-center gap-3 py-2.5 text-sm text-red-500 hover:text-red-600 transition-colors"
                     >
-                      <span className="text-base">🚪</span>
+                      <i className="fa-solid fa-door-open text-red-400 text-sm"></i>
                       <span>Logout</span>
                     </button>
                   </div>
