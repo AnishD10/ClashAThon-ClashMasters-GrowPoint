@@ -12,6 +12,7 @@ export default function CareerRecommendationsPage() {
   const [selectedCareer, setSelectedCareer] = useState(null);
   const [careerDetail, setCareerDetail] = useState(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [detailError, setDetailError] = useState("");
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -30,12 +31,14 @@ export default function CareerRecommendationsPage() {
 
   const handleViewDetails = async (career) => {
     setSelectedCareer(career);
+    setCareerDetail(null);
+    setDetailError("");
     setLoadingDetail(true);
     try {
       const res = await careerAPI.getCareerDetail(career._id);
       setCareerDetail(res.data);
     } catch (err) {
-      console.error("Error fetching career details:", err);
+      setDetailError(err.response?.data?.error || "Failed to load career details");
     } finally {
       setLoadingDetail(false);
     }
@@ -48,7 +51,11 @@ export default function CareerRecommendationsPage() {
   const handleCloseModal = () => {
     setSelectedCareer(null);
     setCareerDetail(null);
+    setDetailError("");
   };
+
+  const formatSalary = (value) =>
+    typeof value === "number" ? value.toLocaleString() : "-";
 
   if (loading) {
     return <div className="page-container text-center py-8">Loading...</div>;
@@ -89,6 +96,8 @@ export default function CareerRecommendationsPage() {
       <Modal isOpen={!!selectedCareer} onClose={handleCloseModal}>
         {loadingDetail ? (
           <div className="text-center py-8">Loading career details...</div>
+        ) : detailError ? (
+          <div className="text-center py-8 text-red-600">{detailError}</div>
         ) : careerDetail ? (
           <div className="space-y-6">
             <div>
@@ -122,19 +131,19 @@ export default function CareerRecommendationsPage() {
                   <div>
                     <p className="text-xs text-gray-600">Entry Level</p>
                     <p className="font-semibold">
-                      {selectedCareer.salary_range.entry_min?.toLocaleString()} - {selectedCareer.salary_range.entry_max?.toLocaleString()}
+                      {formatSalary(selectedCareer.salary_range.entry_min)} - {formatSalary(selectedCareer.salary_range.entry_max)}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-600">Mid Level</p>
                     <p className="font-semibold">
-                      {selectedCareer.salary_range.mid_min?.toLocaleString()} - {selectedCareer.salary_range.mid_max?.toLocaleString()}
+                      {formatSalary(selectedCareer.salary_range.mid_min)} - {formatSalary(selectedCareer.salary_range.mid_max)}
                     </p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-600">Senior Level</p>
                     <p className="font-semibold">
-                      {selectedCareer.salary_range.senior_min?.toLocaleString()} - {selectedCareer.salary_range.senior_max?.toLocaleString()}
+                      {formatSalary(selectedCareer.salary_range.senior_min)} - {formatSalary(selectedCareer.salary_range.senior_max)}
                     </p>
                   </div>
                 </div>
@@ -175,7 +184,9 @@ export default function CareerRecommendationsPage() {
               </button>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="text-center py-8 text-gray-500">No details available.</div>
+        )}
       </Modal>
     </div>
   );

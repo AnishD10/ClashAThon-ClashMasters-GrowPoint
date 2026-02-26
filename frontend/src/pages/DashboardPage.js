@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { userAPI, assessmentAPI } from "../services/api";
 
@@ -12,7 +13,9 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [dashboard, setDashboard] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
+  const [progressItems, setProgressItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,8 +25,11 @@ export default function DashboardPage() {
 
         const recRes = await assessmentAPI.getRecommendations();
         setRecommendations(recRes.data.recommendations);
+
+        const progressRes = await userAPI.getUserProgress();
+        setProgressItems(progressRes.data.progress || []);
       } catch (err) {
-        console.error("Error fetching dashboard:", err);
+        setError(err.response?.data?.error || "Failed to load dashboard data");
       } finally {
         setLoading(false);
       }
@@ -36,6 +42,11 @@ export default function DashboardPage() {
 
   return (
     <div className="page-container">
+      {error && (
+        <div className="bg-red-100 text-red-700 p-3 rounded mb-6">
+          {error}
+        </div>
+      )}
       <h1 className="text-4xl font-bold mb-8">Welcome, {user?.name}! 👋</h1>
 
       {/* Stats Cards */}
@@ -100,7 +111,9 @@ export default function DashboardPage() {
                   <span className="text-sm bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                     {path.difficulty_level}
                   </span>
-                  <button className="btn-primary text-sm">Start Learning</button>
+                  <Link to="/skills" className="btn-primary text-sm">
+                    Start Learning
+                  </Link>
                 </div>
               </div>
             ))}
@@ -114,9 +127,33 @@ export default function DashboardPage() {
           <h3 className="text-xl font-bold mb-4">
             Take assessments to get personalized recommendations!
           </h3>
-          <a href="/assessments" className="btn-primary">
+          <Link to="/assessments" className="btn-primary">
             Start Assessment
-          </a>
+          </Link>
+        </div>
+      )}
+
+      {progressItems.length > 0 && (
+        <div className="card mt-8">
+          <h2 className="text-2xl font-bold mb-4">Your Skill Progress</h2>
+          <div className="space-y-3">
+            {progressItems.slice(0, 5).map((item) => (
+              <div key={item._id} className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold">
+                    {item.skill_id?.name || "Skill"}
+                  </p>
+                  <p className="text-sm text-gray-500">{item.status}</p>
+                </div>
+                <div className="w-32 bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full"
+                    style={{ width: `${item.completion_percentage || 0}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

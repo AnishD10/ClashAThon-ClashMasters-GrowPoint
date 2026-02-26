@@ -44,7 +44,7 @@ export default function Navbar() {
                 {openDropdown === "dashboard" && (
                   <div className="absolute top-8 left-0 bg-white border border-gray-100 rounded-xl shadow-lg py-2 w-44 z-50">
                     <Link to="/dashboard" onClick={() => setOpenDropdown(null)} className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1a1a1a]">Overview</Link>
-                    <Link to="/dashboard/progress" onClick={() => setOpenDropdown(null)} className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1a1a1a]">My Progress</Link>
+                    <Link to="/profile" onClick={() => setOpenDropdown(null)} className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1a1a1a]">Profile</Link>
                   </div>
                 )}
               </div>
@@ -63,7 +63,7 @@ export default function Navbar() {
                 {openDropdown === "skills" && (
                   <div className="absolute top-8 left-0 bg-white border border-gray-100 rounded-xl shadow-lg py-2 w-44 z-50">
                     <Link to="/skills" onClick={() => setOpenDropdown(null)} className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1a1a1a]">Browse Skills</Link>
-                    <Link to="/skills/recommended" onClick={() => setOpenDropdown(null)} className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1a1a1a]">Recommended</Link>
+                    <Link to="/careers" onClick={() => setOpenDropdown(null)} className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-[#1a1a1a]">Career Matches</Link>
                   </div>
                 )}
               </div>
@@ -76,9 +76,25 @@ export default function Navbar() {
                 Assessments
               </Link>
 
+              <Link
+                to="/careers"
+                className="text-sm text-gray-600 hover:text-[#1a1a1a] font-medium transition-colors"
+              >
+                Careers
+              </Link>
+
+              <Link
+                to="/courses"
+                className="text-sm text-gray-600 hover:text-[#1a1a1a] font-medium transition-colors"
+              >
+                Courses
+              </Link>
+
               {/* User name + Logout */}
               <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500 font-medium">{user?.name}</span>
+                <Link to="/profile" className="text-sm text-gray-500 font-medium">
+                  {user?.name}
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="bg-[#1a1a1a] text-white text-sm font-medium px-5 py-2 rounded-full hover:bg-gray-800 transition-colors"

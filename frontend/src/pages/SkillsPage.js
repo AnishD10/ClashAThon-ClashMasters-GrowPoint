@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { skillAPI } from "../services/api";
 
 /**
@@ -8,6 +9,7 @@ import { skillAPI } from "../services/api";
  */
 
 export default function SkillsPage() {
+  const navigate = useNavigate();
   const [skills, setSkills] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -115,7 +117,12 @@ export default function SkillsPage() {
               </span>
             </div>
 
-            <button className="btn-primary w-full mt-4">Learn Now</button>
+            <button
+              className="btn-primary w-full mt-4"
+              onClick={() => navigate(`/skills/${skill._id}`)}
+            >
+              Learn Now
+            </button>
           </div>
         ))}
       </div>

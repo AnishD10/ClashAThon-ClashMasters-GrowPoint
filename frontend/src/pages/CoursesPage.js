@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { courseAPI } from "../services/api";
 
 export default function CoursesPage() {
@@ -44,7 +44,12 @@ export default function CoursesPage() {
       <h1 className="text-4xl font-bold mb-6">Courses</h1>
       {courses.length === 0 ? (
         <div className="text-gray-500 text-center py-12">
-          No courses available yet.
+          {skillId ? "No courses found for this skill yet." : "No courses available yet."}
+          <div className="mt-3">
+            <Link to="/skills" className="text-blue-600 underline">
+              Browse skills
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -56,7 +61,17 @@ export default function CoursesPage() {
                 <span className="text-sm text-gray-500">
                   {course.provider || "Provider"}
                 </span>
-                <button className="btn-primary">Start Learning</button>
+                <button
+                  className="btn-primary"
+                  onClick={() => {
+                    if (course.url) {
+                      window.open(course.url, "_blank", "noopener,noreferrer");
+                    }
+                  }}
+                  disabled={!course.url}
+                >
+                  Start Learning
+                </button>
               </div>
             </div>
           ))}

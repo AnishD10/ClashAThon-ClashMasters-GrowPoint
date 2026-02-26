@@ -50,12 +50,18 @@ export default function HomePage() {
             value of your graduate education.
           </p>
           <div className="flex items-center gap-4">
-            <button className="bg-black rounded-full text-white px-6 py-3 font-medium hover:bg-gray-800 hover:text-white transition-colors">
+            <Link
+              to="/register"
+              className="bg-black rounded-full text-white px-6 py-3 font-medium hover:bg-gray-800 hover:text-white transition-colors"
+            >
               Get Started — It's Free
-            </button>
-            <button className="text-sm text-gray-400 hover:text-gray-700 underline underline-offset-2 transition-colors">
+            </Link>
+            <Link
+              to="/assessments"
+              className="text-sm text-gray-400 hover:text-gray-700 underline underline-offset-2 transition-colors"
+            >
               View Assessments →
-            </button>
+            </Link>
           </div>
           <p className="text-xs text-gray-400 mt-4">
             No credit card required · Free plan available
@@ -332,12 +338,12 @@ export default function HomePage() {
     {/* Bottom CTA */}
     <div className="text-center mt-12">
       <p className="text-sm text-gray-400 mb-4">Not sure which path fits you?</p>
-      <a
-        href="/assessments"
-        className="inline-block bg-[#0f1f18] text-white text-sm font-semibold px-8 py-3 rounded-full hover:bg-[#2d4a3e] transition-colors">
-
-        <p className="text-white">Take the Free Assessment →</p>
-      </a>
+      <Link
+        to="/assessments"
+        className="inline-block bg-[#0f1f18] text-white text-sm font-semibold px-8 py-3 rounded-full hover:bg-[#2d4a3e] transition-colors"
+      >
+        Take the Free Assessment →
+      </Link>
     </div>
 
   </div>

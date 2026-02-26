@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { courseAPI, skillAPI } from "../services/api";
 
 export default function SkillDetailPage() {
@@ -57,7 +57,12 @@ export default function SkillDetailPage() {
       <div className="card mb-8">
         <h2 className="text-2xl font-bold mb-4">Courses for this skill</h2>
         {courses.length === 0 ? (
-          <p className="text-gray-500">No courses available yet.</p>
+          <div className="text-gray-500">
+            <p>No courses available yet.</p>
+            <Link to="/courses" className="text-blue-600 underline">
+              Browse all courses
+            </Link>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {courses.map((course) => (
@@ -66,7 +71,13 @@ export default function SkillDetailPage() {
                 <p className="text-sm text-gray-600 mb-3">{course.description}</p>
                 <button
                   className="btn-primary"
-                  onClick={() => navigate(`/courses?skill=${skillId}`)}
+                  onClick={() => {
+                    if (course.url) {
+                      window.open(course.url, "_blank", "noopener,noreferrer");
+                      return;
+                    }
+                    navigate(`/courses?skill=${skillId}`);
+                  }}
                 >
                   Start Learning
                 </button>

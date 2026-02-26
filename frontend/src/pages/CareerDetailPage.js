@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { careerAPI } from "../services/api";
 
 export default function CareerDetailPage() {
+  const navigate = useNavigate();
   const { careerId } = useParams();
   const [career, setCareer] = useState(null);
   const [skills, setSkills] = useState([]);
@@ -80,7 +81,13 @@ export default function CareerDetailPage() {
             {skills.map((skill) => (
               <div key={skill._id} className="border rounded-lg p-4">
                 <h3 className="font-semibold mb-2">{skill.name}</h3>
-                <p className="text-sm text-gray-600">{skill.description}</p>
+                <p className="text-sm text-gray-600 mb-3">{skill.description}</p>
+                <button
+                  className="btn-primary text-sm"
+                  onClick={() => navigate(`/skills/${skill._id}`)}
+                >
+                  Learn
+                </button>
               </div>
             ))}
           </div>
