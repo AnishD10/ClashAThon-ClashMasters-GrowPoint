@@ -2,40 +2,31 @@ const path = require("path");
 const express = require("express");
 const cors = require("cors");
 
-// Load environment variables
-// Docker-compose env vars take precedence over .env file
 require("dotenv").config({
   path: path.resolve(__dirname, "../.env"),
-  override: false,  // Don't override existing environment variables from docker-compose
+  override: false,
 });
 
 const connectDB = require("./config/db");
 
-// Initialize Express app
 const app = express();
 
-// Connect to MongoDB
 console.log("Starting server and connecting to database...");
 connectDB();
 
-
-
-// Middleware
 app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:3000" }));
 app.use(express.json());
 
-// Routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/skills", require("./routes/skillRoutes"));
 app.use("/api/assessments", require("./routes/assessmentRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
+app.use("/api/careers", require("./routes/careerProfileRoutes"));
 
-// Health Check
 app.get("/api/health", (req, res) => {
   res.status(200).json({ message: "Server is running", timestamp: new Date() });
 });
 
-// Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({
@@ -46,7 +37,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT} `);
   console.log(`Environment: ${process.env.NODE_ENV}`);
 });
 

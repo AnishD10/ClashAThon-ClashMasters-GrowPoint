@@ -1,10 +1,5 @@
 const mongoose = require("mongoose");
 
-/**
- * Learning Path Schema
- * WHY: Curated sequence of skills in a specific domain
- * Guides users through a structured learning journey instead of random choices
- */
 const learningPathSchema = new mongoose.Schema(
   {
     title: {
@@ -16,7 +11,7 @@ const learningPathSchema = new mongoose.Schema(
     category: String,
     target_users: [
       {
-        type: String, // e.g., "Web Developer", "Data Analyst"
+        type: String,
       },
     ],
     skills: [
@@ -25,7 +20,7 @@ const learningPathSchema = new mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId,
           ref: "Skill",
         },
-        order: Number, // Sequence within the path
+        order: Number,
         is_mandatory: Boolean,
       },
     ],
@@ -34,7 +29,7 @@ const learningPathSchema = new mongoose.Schema(
       type: String,
       enum: ["Beginner", "Intermediate", "Advanced"],
     },
-    job_outcomes: [String], // Jobs learner can pursue after
+    job_outcomes: [String],
     is_active: {
       type: Boolean,
       default: true,

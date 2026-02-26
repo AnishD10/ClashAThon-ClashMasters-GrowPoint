@@ -1,10 +1,5 @@
 const mongoose = require("mongoose");
 
-/**
- * Skill Schema
- * WHY: Catalog of all available skills that users can learn
- * Stores skill info like name, category, difficulty, description
- */
 const skillSchema = new mongoose.Schema(
   {
     name: {
@@ -33,8 +28,8 @@ const skillSchema = new mongoose.Schema(
       enum: ["Beginner", "Intermediate", "Advanced"],
       default: "Beginner",
     },
-    learning_time_hours: Number, // Expected hours to learn
-    prerequisites: [String], // Other skills needed first
+    learning_time_hours: Number,
+    prerequisites: [String],
     job_market_demand: {
       type: String,
       enum: ["High", "Medium", "Low"],
@@ -45,7 +40,7 @@ const skillSchema = new mongoose.Schema(
     },
     resources: [
       {
-        type: String, // URLs to courses, docs, etc.
+        type: String,
       },
     ],
   },

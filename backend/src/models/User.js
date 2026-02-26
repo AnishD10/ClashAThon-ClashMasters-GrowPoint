@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-/**
- * User Schema
- * WHY: Stores user account data, authentication credentials, and preferences
- */
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -22,15 +18,15 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, "Please provide a password"],
-      minlength: 6,
-      select: false, // Don't return password by default
+      minlength: 8,
+      select: false,
     },
     education_level: {
       type: String,
       enum: ["+2", "Bachelor's", "Master's", "Other"],
       default: "+2",
     },
-    interests: [String], // e.g., ["Web Development", "Data Science"]
+    interests: [String],
     role: {
       type: String,
       enum: ["student", "admin"],
@@ -44,10 +40,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-/**
- * Hash password before saving
- * WHY: Security - passwords must never be stored in plain text
- */
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
@@ -60,10 +52,6 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-/**
- * Compare password method
- * WHY: Used during login to verify user credentials
- */
 userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };

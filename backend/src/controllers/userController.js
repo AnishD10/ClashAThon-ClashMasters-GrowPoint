@@ -1,10 +1,6 @@
 const User = require("../models/User");
 const UserProgress = require("../models/UserProgress");
 
-/**
- * Get User Profile
- * WHY: Returns user's account and learning data
- */
 exports.getUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
@@ -14,10 +10,6 @@ exports.getUserProfile = async (req, res) => {
   }
 };
 
-/**
- * Update User Profile
- * WHY: Allows users to update their info, interests, education level
- */
 exports.updateUserProfile = async (req, res) => {
   try {
     const { name, education_level, interests, profile_completed } = req.body;
@@ -34,23 +26,15 @@ exports.updateUserProfile = async (req, res) => {
   }
 };
 
-/**
- * Get User Learning Dashboard
- * WHY: Shows overall progress, completed skills, current learning status
- * Dashboard displays: Total skills attempted, completion %, trending skills
- */
 exports.getUserDashboard = async (req, res) => {
   try {
     const userId = req.user.id;
 
-    // Get user
     const user = await User.findById(userId);
 
-    // Get user's progress
     const progress = await UserProgress.find({ user_id: userId })
       .populate("skill_id assessment_id");
 
-    // Calculate stats
     const totalAttempted = progress.length;
     const completed = progress.filter((p) => p.status === "Completed").length;
     const inProgress = progress.filter((p) => p.status === "In Progress").length;
@@ -81,10 +65,6 @@ exports.getUserDashboard = async (req, res) => {
   }
 };
 
-/**
- * Get User Learning Progress
- * WHY: Detailed skill-wise progress for tracking improvement
- */
 exports.getUserProgress = async (req, res) => {
   try {
     const userId = req.user.id;

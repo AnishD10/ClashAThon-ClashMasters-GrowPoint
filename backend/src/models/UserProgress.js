@@ -1,10 +1,5 @@
 const mongoose = require("mongoose");
 
-/**
- * User Progress Schema
- * WHY: Tracks each user's learning journey, completion status, and performance
- * Essential for personalization and progress visualization
- */
 const userProgressSchema = new mongoose.Schema(
   {
     user_id: {
@@ -25,7 +20,7 @@ const userProgressSchema = new mongoose.Schema(
       enum: ["Not Started", "In Progress", "Completed"],
       default: "Not Started",
     },
-    score: Number, // Assessment score out of 100
+    score: Number,
     completion_percentage: {
       type: Number,
       default: 0,
@@ -41,7 +36,6 @@ const userProgressSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Compound index for unique user-skill tracking
 userProgressSchema.index({ user_id: 1, skill_id: 1 }, { unique: true, sparse: true });
 
 module.exports = mongoose.model("UserProgress", userProgressSchema);
