@@ -27,6 +27,10 @@ exports.startAssessment = async (req, res) => {
       return res.status(404).json({ error: "Assessment not found" });
     }
 
+    if (!assessment.questions || assessment.questions.length === 0) {
+      return res.status(400).json({ error: "Assessment has no questions" });
+    }
+
     const progress = await UserProgress.create({
       user_id: userId,
       assessment_id,
@@ -42,15 +46,19 @@ exports.startAssessment = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      _id: assessment._id,
+      title: assessment.title,
+      duration_minutes: assessment.duration_minutes,
+      questions: questionsWithoutAnswers,
+      total_questions: assessment.questions.length,
+      progress_id: progress._id,
       assessment: {
         title: assessment.title,
         duration_minutes: assessment.duration_minutes,
-        questions: questionsWithoutAnswers,
-        total_questions: assessment.questions.length,
       },
-      progress_id: progress._id,
     });
   } catch (error) {
+    console.error("❌ Error in startAssessment:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -155,6 +163,7 @@ exports.submitAssessment = async (req, res) => {
 
     const overallPercentage = Math.round((totalScore / totalMaxScore) * 100);
     const overallProfile = getProfileInterpretation(totalScore, totalMaxScore);
+    const passed = overallPercentage >= assessment.passing_score;
 
     const progress = await UserProgress.findByIdAndUpdate(
       progress_id,
@@ -169,13 +178,15 @@ exports.submitAssessment = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      overall_score: overallPercentage,
+      score: overallPercentage,
+      passed: passed,
       overall_profile: overallProfile,
       category_profiles: categoryProfiles,
       detailed_results,
-      message: "Assessment completed. Review your psychometric profile above.",
+      message: `Assessment completed. Score: ${overallPercentage}/100. ${passed ? "PASSED ✅" : "TRY AGAIN 📚"}`,
     });
   } catch (error) {
+    console.error("❌ Error in submitAssessment:", error);
     res.status(500).json({ error: error.message });
   }
 };

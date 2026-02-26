@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { courseAPI } from "../services/api";
+import Modal from "../components/Modal";
 
 export default function CoursesPage() {
   const location = useLocation();
@@ -9,6 +10,7 @@ export default function CoursesPage() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -62,21 +64,78 @@ export default function CoursesPage() {
                   {course.provider || "Provider"}
                 </span>
                 <button
-                  className="btn-primary"
-                  onClick={() => {
-                    if (course.url) {
-                      window.open(course.url, "_blank", "noopener,noreferrer");
-                    }
-                  }}
-                  disabled={!course.url}
+                  className="btn-secondary"
+                  onClick={() => setSelectedCourse(course)}
                 >
-                  Start Learning
+                  View Details
                 </button>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <Modal
+        isOpen={!!selectedCourse}
+        onClose={() => setSelectedCourse(null)}
+        title={selectedCourse?.title || "Course Details"}
+      >
+        {selectedCourse && (
+          <div className="space-y-4">
+            <p className="text-gray-600">{selectedCourse.description}</p>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-gray-500">Provider</p>
+                <p className="font-semibold">
+                  {selectedCourse.provider || "-"}
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-500">Difficulty</p>
+                <p className="font-semibold">
+                  {selectedCourse.difficulty_level || "-"}
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-500">Duration</p>
+                <p className="font-semibold">
+                  {selectedCourse.duration_hours
+                    ? `${selectedCourse.duration_hours} hours`
+                    : "-"}
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-500">Price</p>
+                <p className="font-semibold">
+                  {selectedCourse.is_free
+                    ? "Free"
+                    : selectedCourse.price || "-"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                className="btn-primary"
+                onClick={() => {
+                  if (selectedCourse.url) {
+                    window.open(selectedCourse.url, "_blank", "noopener,noreferrer");
+                  }
+                }}
+                disabled={!selectedCourse.url}
+              >
+                Start Learning
+              </button>
+              <button
+                className="btn-secondary"
+                onClick={() => setSelectedCourse(null)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

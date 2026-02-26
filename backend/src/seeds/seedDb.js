@@ -21,11 +21,15 @@ require("dotenv").config({
 const Assessment = require("../models/Assessment");
 const LearningPath = require("../models/LearningPath");
 const CareerProfile = require("../models/CareerProfile");
+const Skill = require("../models/Skill");
+const Course = require("../models/Course");
 
 // Import questionnaires
 const questionnaires = require("./questionnaires");
 const learningPaths = require("./learningPaths");
 const careerProfiles = require("./careerProfiles");
+const skills = require("./skills");
+const courses = require("./courses");
 
 const redactMongoUri = (uri) =>
   uri.replace(/(mongodb(?:\+srv)?:\/\/[^:]+:)([^@]+)@/i, "$1***@");
@@ -69,13 +73,23 @@ const seedDatabase = async () => {
     const existingAssessments = await Assessment.countDocuments();
     const existingLearningPaths = await LearningPath.countDocuments();
     const existingCareerProfiles = await CareerProfile.countDocuments();
-    if (existingAssessments > 0 || existingLearningPaths > 0 || existingCareerProfiles > 0) {
+    const existingSkills = await Skill.countDocuments();
+    const existingCourses = await Course.countDocuments();
+    if (
+      existingAssessments > 0 ||
+      existingLearningPaths > 0 ||
+      existingCareerProfiles > 0 ||
+      existingSkills > 0 ||
+      existingCourses > 0
+    ) {
       console.log(
-        `⚠️  Found ${existingAssessments} assessments, ${existingLearningPaths} learning paths, and ${existingCareerProfiles} career profiles. Clearing database...`
+        `⚠️  Found ${existingAssessments} assessments, ${existingLearningPaths} learning paths, ${existingCareerProfiles} career profiles, ${existingSkills} skills, and ${existingCourses} courses. Clearing database...`
       );
       await Assessment.deleteMany({});
       await LearningPath.deleteMany({});
       await CareerProfile.deleteMany({});
+      await Skill.deleteMany({});
+      await Course.deleteMany({});
       console.log("🗑️  Database cleared");
     }
 
@@ -90,10 +104,46 @@ const seedDatabase = async () => {
       console.log(`   - Duration: ${assessment.duration_minutes} minutes`);
     }
 
+    // Insert skills
+    console.log(`\n🧠 Seeding ${skills.length} skill(s)...`);
+    const skillDocs = [];
+    for (const skill of skills) {
+      const doc = new Skill(skill);
+      await doc.save();
+      skillDocs.push(doc);
+      console.log(`✅ Seeded: "${doc.name}" (${doc.category})`);
+    }
+
+    const skillByName = skillDocs.reduce((acc, doc) => {
+      acc[doc.name] = doc._id;
+      return acc;
+    }, {});
+
     // Insert learning paths
     console.log(`\n🧭 Seeding ${learningPaths.length} learning path(s)...`);
     for (const learningPath of learningPaths) {
-      const path = new LearningPath(learningPath);
+      const skillNames = learningPath.skill_names || [];
+      const resolvedSkills = skillNames
+        .map((name, index) => {
+          const skillId = skillByName[name];
+          if (!skillId) {
+            console.warn(`⚠️  Missing skill for learning path: ${name}`);
+            return null;
+          }
+          return {
+            skill_id: skillId,
+            order: index + 1,
+            is_mandatory: true,
+          };
+        })
+        .filter(Boolean);
+
+      const payload = {
+        ...learningPath,
+        skills: resolvedSkills,
+      };
+
+      const path = new LearningPath(payload);
       await path.save();
       console.log(`✅ Seeded: "${path.title}" (${path.category})`);
     }
@@ -106,6 +156,39 @@ const seedDatabase = async () => {
       console.log(`✅ Seeded: "${profile.title}" (${profile.category})`);
     }
 
+    // Insert courses
+    console.log(`\n📚 Seeding ${courses.length} course(s)...`);
+    for (const course of courses) {
+      const skillIds = (course.skill_names || [])
+        .map((name) => skillByName[name])
+        .filter(Boolean);
+
+      if (skillIds.length === 0) {
+        console.warn(`⚠️  Skipping course without valid skills: ${course.title}`);
+        continue;
+      }
+
+      const payload = {
+        title: course.title,
+        description: course.description,
+        provider: course.provider,
+        url: course.url,
+        duration_hours: course.duration_hours,
+        difficulty_level: course.difficulty_level,
+        language: course.language,
+        price: course.price,
+        is_free: course.is_free,
+        thumbnail_url: course.thumbnail_url,
+        skills: skillIds,
+        tags: course.tags,
+        is_active: true,
+      };
+
+      const doc = new Course(payload);
+      await doc.save();
+      console.log(`✅ Seeded: "${doc.title}" (${doc.provider || "Provider"})`);
+    }
+
     console.log("\n🎉 Database seeding completed successfully!");
     console.log(
       `📊 Total assessments: ${await Assessment.countDocuments()}`
@@ -115,6 +198,12 @@ const seedDatabase = async () => {
     );
     console.log(
       `💼 Total career profiles: ${await CareerProfile.countDocuments()}`
+    );
+    console.log(
+      `🧠 Total skills: ${await Skill.countDocuments()}`
+    );
+    console.log(
+      `📚 Total courses: ${await Course.countDocuments()}`
     );
 
     // Display summary
@@ -148,6 +237,23 @@ const seedDatabase = async () => {
           `  Entry Salary: ${profile.salary_range.entry_min}-${profile.salary_range.entry_max} ${profile.salary_range.currency}`
         );
       }
+    });
+
+    const skillList = await Skill.find();
+    console.log("\n🧠 Skill Summary:");
+    skillList.forEach((skill) => {
+      console.log(`\n  ${skill.name}`);
+      console.log(`  Category: ${skill.category}`);
+      console.log(`  Difficulty: ${skill.difficulty_level}`);
+    });
+
+    const courseList = await Course.find().populate("skills");
+    console.log("\n📚 Course Summary:");
+    courseList.forEach((course) => {
+      const skillNames = (course.skills || []).map((skill) => skill.name).join(", ");
+      console.log(`\n  ${course.title}`);
+      console.log(`  Provider: ${course.provider || "Provider"}`);
+      console.log(`  Skills: ${skillNames || "None"}`);
     });
 
     process.exit(0);

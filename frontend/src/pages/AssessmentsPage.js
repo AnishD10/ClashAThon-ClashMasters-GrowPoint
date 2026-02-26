@@ -56,12 +56,17 @@ export default function AssessmentsPage() {
         answers,
       });
 
-      alert(`Score: ${res.data.score}/${100}\nResult: ${res.data.passed ? "PASSED ✅" : "TRY AGAIN 📚"}`);
+      const scoreData = res.data || res;
+      const score = scoreData.score || scoreData.overall_score || 0;
+      const passed = scoreData.passed !== undefined ? scoreData.passed : (score >= 60);
+
+      alert(`Score: ${score}/100\nResult: ${passed ? "PASSED ✅" : "TRY AGAIN 📚"}`);
       setSelectedAssessment(null);
       setAnswers([]);
       setCurrentQuestion(0);
     } catch (err) {
       console.error("Error submitting assessment:", err);
+      alert(`Error submitting assessment: ${err.message}`);
     }
   };
 

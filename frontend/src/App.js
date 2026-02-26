@@ -10,9 +10,11 @@ import SkillsPage from "./pages/SkillsPage";
 import AssessmentsPage from "./pages/AssessmentsPage";
 import CareerRecommendationsPage from "./pages/CareerRecommendationsPage";
 import CareerDetailPage from "./pages/CareerDetailPage";
+import CareerScopePage from "./pages/CareerScopePage";
 import SkillDetailPage from "./pages/SkillDetailPage";
 import CoursesPage from "./pages/CoursesPage";
 import ProfilePage from "./pages/ProfilePage";
+import OnboardingInterestsPage from "./pages/OnboardingInterestsPage";
 import "./styles/index.css";
 
 /**
@@ -62,6 +64,14 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/onboarding/interests"
+          element={
+            <ProtectedRoute>
+              <OnboardingInterestsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/skills"
           element={
             <ProtectedRoute>
@@ -90,6 +100,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <CareerDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/careers/:careerId/scope"
+          element={
+            <ProtectedRoute>
+              <CareerScopePage />
             </ProtectedRoute>
           }
         />

@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon --legacy-watch src/server.js",
+    "seed": "node src/seeds/seedDb.js",
+    "seed:users": "node src/seeds/seedUsers.js",
     "test": "jest"
   },
   "keywords": [

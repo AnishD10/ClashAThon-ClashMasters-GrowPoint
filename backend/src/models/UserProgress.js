@@ -36,6 +36,7 @@ const userProgressSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-userProgressSchema.index({ user_id: 1, skill_id: 1 }, { unique: true, sparse: true });
+// Index for querying user progress by skill (non-unique, allows multiple assessment attempts)
+userProgressSchema.index({ user_id: 1, skill_id: 1 });
 
 module.exports = mongoose.model("UserProgress", userProgressSchema);

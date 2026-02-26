@@ -63,6 +63,8 @@ export const careerAPI = {
   getAllCareers: (params) => api.get("/careers", { params }),
   getCareerById: (id) => api.get(`/careers/${id}`),
   getCareerDetail: (id) => api.get(`/careers/${id}/detail`),
+  getConstraintRecommendations: (data) =>
+    api.post("/careers/recommendations/constraints", data),
 };
 
 export const courseAPI = {

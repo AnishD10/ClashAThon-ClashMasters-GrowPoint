@@ -39,7 +39,7 @@ export default function RegisterPage() {
         formData.password,
         formData.education_level
       );
-      navigate("/dashboard");
+      navigate("/onboarding/interests");
     } catch (err) {
       setError(err.response?.data?.error || "Registration failed");
     } finally {
