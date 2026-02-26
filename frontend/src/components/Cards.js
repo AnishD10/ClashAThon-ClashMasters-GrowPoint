@@ -21,10 +21,10 @@ function Cards() {
                 {/* Cards Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {[
-                    { icon: "⭐", title: "Skill Assessment", desc: "Our assessment tools will identify your strengths and areas for growth.", color: "text-rose-400" },
-                    { icon: "🌐", title: "Career Consulting", desc: "Our support team will guide you toward the right career path.", color: "text-blue-400" },
-                    { icon: "🖼️", title: "Learning Paths", desc: "Structured roadmaps built to take you from beginner to job-ready.", color: "text-teal-400" },
-                    { icon: "📈", title: "Market Analysis", desc: "Stay updated on trending skills and job market demand in your field.", color: "text-teal-400" },
+                    { icon: "fa-solid fa-clipboard-check", title: "Skill Assessment", desc: "Our assessment tools will identify your strengths and areas for growth." },
+                    { icon: "fa-solid fa-compass", title: "Career Consulting", desc: "Our support team will guide you toward the right career path." },
+                    { icon: "fa-solid fa-route", title: "Learning Paths", desc: "Structured roadmaps built to take you from beginner to job-ready." },
+                    { icon: "fa-solid fa-chart-line", title: "Market Analysis", desc: "Stay updated on trending skills and job market demand in your field." },
                 ].map((service, i) => (
                     <div
                     key={i}
@@ -32,7 +32,7 @@ function Cards() {
                         i === 0 ? "shadow-md" : ""
                     }`}
                     >
-                    <span className={`text-4xl mb-6 ${service.color}`}>{service.icon}</span>
+                    <i className={`${service.icon} text-3xl mb-6 text-[#071642]`}></i>
                     <h3 className="text-xs font-bold tracking-widest uppercase text-[#1a1a1a] mb-3">
                         {service.title}
                     </h3>

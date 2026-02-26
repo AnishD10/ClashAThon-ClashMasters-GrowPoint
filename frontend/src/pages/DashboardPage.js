@@ -47,7 +47,7 @@ export default function DashboardPage() {
           {error}
         </div>
       )}
-      <h1 className="text-4xl font-bold mb-8">Welcome, {user?.name}! 👋</h1>
+      <h1 className="text-4xl font-bold mb-8">Welcome, {user?.name}! <i className="fa-solid fa-hand-wave"></i></h1>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
@@ -100,7 +100,7 @@ export default function DashboardPage() {
       {recommendations.length > 0 && (
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-4">
-            📌 Recommended Learning Paths
+            <i className="fa-solid fa-thumbtack mr-2"></i> Recommended Learning Paths
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {recommendations.slice(0, 4).map((path) => (

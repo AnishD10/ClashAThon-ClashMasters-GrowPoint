@@ -60,7 +60,7 @@ export default function AssessmentsPage() {
       const score = scoreData.score || scoreData.overall_score || 0;
       const passed = scoreData.passed !== undefined ? scoreData.passed : (score >= 60);
 
-      alert(`Score: ${score}/100\nResult: ${passed ? "PASSED ✅" : "TRY AGAIN 📚"}`);
+      alert(`Score: ${score}/100\nResult: ${passed ? "PASSED" : "TRY AGAIN"}`);
       setSelectedAssessment(null);
       setAnswers([]);
       setCurrentQuestion(0);
@@ -87,7 +87,7 @@ export default function AssessmentsPage() {
                 Question {currentQuestion + 1} of {selectedAssessment.total_questions}
               </span>
               {selectedAssessment.assessment.duration_minutes && (
-                <span>⏱️ {selectedAssessment.assessment.duration_minutes} minutes</span>
+                <span><i className="fa-regular fa-clock mr-1"></i> {selectedAssessment.assessment.duration_minutes} minutes</span>
               )}
             </div>
 
@@ -162,7 +162,7 @@ export default function AssessmentsPage() {
 
   return (
     <div className="page-container">
-      <h1 className="text-4xl font-bold mb-8">📝 Skill Assessments</h1>
+      <h1 className="text-4xl font-bold mb-8"><i className="fa-solid fa-clipboard-list mr-2"></i> Skill Assessments</h1>
 
       {assessments.length === 0 ? (
         <div className="text-center py-12 text-gray-500">
@@ -179,7 +179,7 @@ export default function AssessmentsPage() {
 
               {assessment.duration_minutes && (
                 <p className="text-sm text-gray-500 mb-4">
-                  ⏱️ Duration: {assessment.duration_minutes} minutes
+                  <i className="fa-regular fa-clock mr-1"></i> Duration: {assessment.duration_minutes} minutes
                 </p>
               )}
 

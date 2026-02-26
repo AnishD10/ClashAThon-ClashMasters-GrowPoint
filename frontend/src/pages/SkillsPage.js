@@ -41,7 +41,7 @@ export default function SkillsPage() {
 
   return (
     <div className="page-container">
-      <h1 className="text-4xl font-bold mb-8">🎯 Explore Skills</h1>
+      <h1 className="text-4xl font-bold mb-8"><i className="fa-solid fa-bullseye mr-2"></i> Explore Skills</h1>
 
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
@@ -109,7 +109,7 @@ export default function SkillsPage() {
             <div className="flex gap-2">
               {skill.trending && (
                 <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
-                  🔥 Trending
+                  <i className="fa-solid fa-fire mr-1"></i> Trending
                 </span>
               )}
               <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
