@@ -1,5 +1,8 @@
 {
-  "framework": "create-react-app",
+  "buildCommand": "cd src/frontend && npm install && npm run build",
+  "outputDirectory": "src/frontend/build",
+  "installCommand": "echo 'skip root install'",
+  "framework": null,
   "rewrites": [
     { "source": "/(.*)", "destination": "/" }
   ]
