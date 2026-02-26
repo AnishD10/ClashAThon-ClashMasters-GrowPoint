@@ -14,7 +14,25 @@ const app = express();
 console.log("Starting server and connecting to database...");
 connectDB();
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:3000" }));
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://clash-a-thon-clash-masters-grow-poi-nu.vercel.app",
+  process.env.CORS_ORIGIN,
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.use("/api/auth", require("./routes/authRoutes"));
